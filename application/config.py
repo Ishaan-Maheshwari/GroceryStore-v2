@@ -7,6 +7,7 @@ class Config():
     SQLALCHEMY_DATABASE_URI = None
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = "ishaan"
+    SECURITY_PASSWORD_SALT = "this is salt"
     SECURITY_CONFIRMABLE = True
     SECURITY_TRACKABLE = True
 

@@ -1,0 +1,29 @@
+[
+    {
+        "created_on": "2023-07-20 01:12:08.806413",
+        "desc": "No offer available on this product",
+        "discount_percent": 0.0,
+        "id": 1,
+        "is_active": 1,
+        "modified_on": "2023-07-20 01:12:52.202504",
+        "name": "NO OFFER"
+    },
+    {
+        "created_on": "2023-07-29 18:31:09.618585",
+        "desc": "Go back to college with money in your hands.",
+        "discount_percent": 25.0,
+        "id": 2,
+        "is_active": 1,
+        "modified_on": "2023-07-29 18:31:09.618585",
+        "name": "BACK_TO_COLLEGE"
+    },
+    {
+        "created_on": "2023-08-13 22:44:04.237632",
+        "desc": "Newly added discount",
+        "discount_percent": 25.0,
+        "id": 3,
+        "is_active": 1,
+        "modified_on": "2023-08-13 22:44:04.237632",
+        "name": "New Discount"
+    }
+]

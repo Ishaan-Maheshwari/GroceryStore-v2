@@ -1,3 +1,6 @@
 flaskenv
 __pychache__
 application/__pycache__
+application/api/__pycache__
+application/controllers/__pycache__
+application/controllers/__pycache__/admin.cpython-310.pyc

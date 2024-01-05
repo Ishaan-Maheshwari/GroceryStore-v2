@@ -1,3 +1,4 @@
+from flask_security import SQLAlchemyUserDatastore
 from .database import db
 from flask_login import UserMixin
 from flask_security.models import fsqla_v3 as fsqla
@@ -22,8 +23,8 @@ class User(db.Model,fsqla.FsUserMixin):
     last_login_ip = db.Column(db.String(100))
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
-    role = db.Column(db.Integer, db.ForeignKey('role.id'))
-    role_type = db.relationship('Role', backref=db.backref('user', lazy=True))
+    # role = db.Column(db.Integer, db.ForeignKey('role.id'))
+    # role_type = db.relationship('Role', backref=db.backref('user', lazy=True))
     created_on = db.Column(db.DateTime, default=datetime.now)
     modified_on = db.Column(db.DateTime, default=datetime.now, onupdate = datetime.now)
 
@@ -102,3 +103,5 @@ class OrderItems(db.Model):
     quantity = db.Column(db.Integer)
     created_on = db.Column(db.DateTime, default=datetime.now)
     modified_on = db.Column(db.DateTime, default=datetime.now, onupdate = datetime.now)
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
