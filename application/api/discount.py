@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
+from flask_security import auth_required
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
@@ -32,6 +33,7 @@ class DiscountResource(Resource):
                 })
             return result, 200
 
+    @auth_required('admin')
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
@@ -49,6 +51,7 @@ class DiscountResource(Resource):
         db.session.commit()
         return {'message': 'Discount created successfully'}, 201
 
+    @auth_required('admin')
     def put(self, discount_id):
         discount = Discount.query.get(discount_id)
         if not discount:
@@ -66,6 +69,7 @@ class DiscountResource(Resource):
         db.session.commit()
         return {'message': 'Discount updated successfully'}, 200
 
+    @auth_required('admin')
     def delete(self, discount_id):
         discount = Discount.query.get(discount_id)
         if not discount:

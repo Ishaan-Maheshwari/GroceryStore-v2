@@ -28,4 +28,40 @@ def manager_register():
             "Active": new_manager.active
         },201
 
+@app.route("/manager/login", methods=['POST'])
+def manager_login():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        username = request_data['username']
+        password = request_data['password']
+        user = user_datastore.find_user(username=username)
+        if user:
+            if verify_password(password, user.password):
+                if user.has_role('manager'):
+                    if user.active == False:
+                        return {"message": "Account is not active. Admin will approve your request."}, 401
+                    login_user(user)
+                    user_datastore.commit()
+                    auth_token = user.get_auth_token()
+                    return {"message": "Login successful", "token":auth_token, "role": "manager"}, 200
+                else:
+                    return {"message": "You are not a manager"}, 401
+            else:
+                return {"message": "Incorrect password"}, 401
+        else:
+            return "User not found"
+
+@app.route("/manager/logout", methods=['POST'])
+def manager_logout():
+    if request.method == 'POST':
+        request_data = request.get_json()
+        username = request_data['username']
+        user = user_datastore.find_user(username=username)
+        if user:
+            user_datastore.delete_auth_token(user)
+            user_datastore.commit()
+            return {"message": "Logout successful"}, 200
+        else:
+            return {"message": "User not found"}, 404
+
 

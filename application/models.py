@@ -59,6 +59,7 @@ class Product(db.Model):
     category = db.relationship('Category', backref=db.backref('products', lazy=True))
     inventory = db.Column(db.Integer, default = 0)
     price = db.Column(db.Float)
+    manf_date = db.Column(db.DateTime, default=datetime.now)
     discount_id = db.Column(db.Integer, db.ForeignKey('discount.id'))
     discount = db.relationship('Discount', backref=db.backref('products', lazy=True))
     created_on = db.Column(db.DateTime, default=datetime.now)
