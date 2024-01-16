@@ -1,6 +1,8 @@
 from flask import current_app as app, request
-from flask_security import auth_required, login_user, logout_user, verify_password
+from flask_security import auth_required, http_auth_required, login_user, logout_user, roles_accepted, verify_password
 from application.models import user_datastore
+from application.database import db
+from application.models import Product, Category, Discount
 
 @app.route("/api/login", methods=['POST'])
 def login():
@@ -34,7 +36,77 @@ def login():
 
 @app.post("/api/logout")
 @auth_required('token')
+@roles_accepted('admin', 'manager', 'user')
 def logout():
     if request.method == 'POST':
         logout_user()
         return {"message": "Logout successful"}, 200
+
+@app.get("/api/all_products")
+def get_all_products():
+    products = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).all()
+    product_details = []
+    if products:
+        for product in products:
+            product_details.append({
+                "product_id": product.Product.id,
+                "product_name": product.Product.name,
+                "product_desc": product.Product.desc,
+                "category": product.Category.name,
+                "category_id": product.Category.id,
+                "inventory": product.Product.inventory,
+                "discount_perc": product.Discount.discount_percent,
+                "discount_id": product.Discount.id,
+                "discount_name": product.Discount.name,
+                "discount_desc": product.Discount.desc,
+                "price": product.Product.price,
+                "manf_date": product.Product.manf_date
+            })
+        return {"products": product_details}, 200
+    else:
+        return {"message" : "Something went wrong. Cannot fetch products."}, 401
+
+@app.get("/api/product/<int:product_id>")
+def get_product(product_id):
+    product = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.id == product_id).first()
+    if product:
+        return {"product": {
+                "product_id": product.Product.id,
+                "product_name": product.Product.name,
+                "product_desc": product.Product.desc,
+                "category": product.Category.name,
+                "category_id": product.Category.id,
+                "inventory": product.Product.inventory,
+                "discount_perc": product.Discount.discount_percent,
+                "discount_id": product.Discount.id,
+                "discount_name": product.Discount.name,
+                "discount_desc": product.Discount.desc,
+                "price": product.Product.price,
+                "manf_date": product.Product.manf_date
+            }}, 200
+    else:
+        return {"message" : "Something went wrong. Cannot fetch product."}, 401
+
+@app.get("/api/category/<int:category_id>/products")
+def get_products_by_category(category_id):
+    products = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.category_id == category_id).all()
+    product_details = []
+    if products:
+        for product in products:
+            product_details.append({
+                "product_id": product.Product.id,
+                "product_name": product.Product.name,
+                "product_desc": product.Product.desc,
+                "category": product.Category.name,
+                "category_id": product.Category.id,
+                "inventory": product.Product.inventory,
+                "discount_perc": product.Discount.discount_percent,
+                "discount_id": product.Discount.id,
+                "discount_name": product.Discount.name,
+                "discount_desc": product.Discount.desc,
+                "price": product.Product.price,
+                "manf_date": product.Product.manf_date
+            })
+        return {"products": product_details}, 200
+    else:
+        return {"message" : "Something went wrong. Cannot fetch products."}, 401

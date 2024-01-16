@@ -37,6 +37,27 @@ export default {
             currentUser: null
         }
     },
+    created() {
+        const token = localStorage.getItem('auth-token');
+        const role = localStorage.getItem('role');
+        const username = localStorage.getItem('username');
+        const first_name = localStorage.getItem('first_name');
+        if(token){
+            this.currentUser = {
+                "role":role,
+                "username":username,
+                "token":token,
+                "first_name": first_name
+            }
+            if(this.currentUser.role == 'admin'){
+                this.$router.push({path:'/admin/home'});
+            }else if(this.currentUser.role == 'manager'){
+                this.$router.push({path:'/'});
+            }else{
+                this.$router.push({path:'/'});
+            }
+        }
+    },
     methods:{
         async login() {
             const res = await fetch('api/login',{
@@ -59,7 +80,11 @@ export default {
                     "role": data.role,
                     "first_name": data.first_name,
                 };
-                this.$router.push({path:'/', props: { currentUser: this.currentUser }});
+                if(this.currentUser.role == 'admin'){
+                    this.$router.push({path:'/admin/home'});
+                }else{
+                    this.$router.push({path:'/'});
+                }
             }else{
                 this.error = data.message
             }

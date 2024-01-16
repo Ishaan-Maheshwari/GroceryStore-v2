@@ -1,5 +1,15 @@
 export default{
     name:'Logout',
+    props:{
+        error_mssg:{
+            type:String,
+            default:null
+        },
+        logout_success:{
+            type:Boolean,
+            default:false
+        }
+    },
     template:`
     <div>
         <h1 class="text-secondary">Logging out...</h1>
@@ -12,34 +22,6 @@ export default{
         <button class="btn btn-secondary" @click="home">Go to Home</button>
     </div>
     `,
-    data(){
-        return{
-            error_mssg:null,
-            logout_success:false
-        }
-    },
-    mounted: {
-        async logout(){
-            const res = await fetch('api/logout',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            const data = await res.json()
-            if (res.ok) {
-                console.log(data);
-                localStorage.removeItem('auth-token')
-                localStorage.removeItem('role')
-                localStorage.removeItem('username')
-                this.currentUser = null
-                this.logout_success = true
-            }
-            else{
-                this.error_mssg = data.error
-            }
-        }
-    },
     methods:{
         home(){
             this.$router.push('/')

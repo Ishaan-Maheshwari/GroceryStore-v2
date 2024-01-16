@@ -1,4 +1,4 @@
-// Description: Navbar component which is used to display the navbar in the admin dashboard
+// Description: Navbar component which is used to display the navbar on the homepage
 
 export default{
     name:'BasicNavbar',
@@ -22,12 +22,7 @@ export default{
                     <li v-if="is_authenticated" class="nav-item">
                         <a class="nav-link text-secondary" href=""><i class="bi bi-person-circle"></i> {{currentUser.username}}</a>
                     </li>
-                    <li v-if="is_authenticated" class="nav-item">
-                        <button class="btn nav-link text-secondary rounded" @click="logout"> <i class="bi bi-box-arrow-right"></i> logout</button>
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link text-secondary border border-secondary rounded" >Are you Admin? <i class="bi bi-tools"></i> </a>
-                    </li> -->   
+                    <button v-if="is_authenticated" class="btn text-secondary rounded" @click="logout"> <i class="bi bi-box-arrow-right"></i>logout</button>  
                 </ul>
                     
             </div>
@@ -68,13 +63,35 @@ export default{
         if(token){
             this.currentUser = {
                 "role":role,
-                "username":username
+                "username":username,
+                "token":token
             }
         }
     },
     methods:{
-        logout(){
-            this.$router.push('/logout')
+        async logout(){
+            const error_mssg = null;
+            const logout_success = false;
+            const res = await fetch('api/logout',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authentication-Token':this.currentUser.token
+                }
+            })
+            const data = await res.json()
+            if (res.ok) {
+                console.log(data);
+                localStorage.removeItem('auth-token')
+                localStorage.removeItem('role')
+                localStorage.removeItem('username')
+                this.currentUser = null
+                this.logout_success = true
+            }
+            else{
+                this.error_mssg = data.error
+            }
+            this.$router.push({path:'/logout', params: { error_mssg:this.error_mssg, logout_success: this.logout_success }});
         },
         admin_dashboard(){
             this.$router.push('/')
@@ -83,9 +100,6 @@ export default{
             this.$router.push('/')
         },
         show_product(){
-            this.$router.push('/')
-        },
-        logout(){
             this.$router.push('/')
         },
         home(){

@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
-from flask_security import auth_required
+from flask_security import auth_required, roles_required
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
@@ -21,7 +21,7 @@ class ProductResource(Resource):
                 'inventory': product.inventory,
                 'price': product.price,
                 'discount_id': product.discount_id,
-                'manf_date': product.manf_date.isoformat() if product.manf_date else None
+                'manf_date': product.manf_date.strftime('%Y-%m-%d') if product.manf_date else None
             }, 200
         else:
             products = Product.query.all()
@@ -40,6 +40,7 @@ class ProductResource(Resource):
             return result, 200
 
     @auth_required('token')
+    @roles_required('admin')
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
@@ -47,7 +48,7 @@ class ProductResource(Resource):
         parser.add_argument('category_id', type=int, required=True)
         parser.add_argument('inventory', type=int, required=True)
         parser.add_argument('price', type=float, required=True)
-        parser.add_argument('discount_id', type=int, required=False)
+        parser.add_argument('discount_id', type=int, required=True)
         parser.add_argument('manf_date', type=lambda x: datetime.strptime(x,'%Y-%m-%d'), required=True)
         args = parser.parse_args()
         
@@ -69,6 +70,7 @@ class ProductResource(Resource):
         return {'message': 'Product created successfully'}, 201
 
     @auth_required('token')
+    @roles_required('admin')
     def put(self, product_id):
         product = Product.query.get(product_id)
         if not product:
@@ -98,6 +100,7 @@ class ProductResource(Resource):
         return {'message': 'Product updated successfully'}, 200
 
     @auth_required('token')
+    @roles_required('admin')
     def delete(self, product_id):
         product = Product.query.get(product_id)
         if not product:

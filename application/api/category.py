@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
-from flask_security import auth_required
+from flask_security import auth_required, roles_required
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
@@ -29,7 +29,8 @@ class CategoryResource(Resource):
                 })
             return result, 200
 
-    @auth_required('admin')
+    @auth_required('token')
+    @roles_required('admin')
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
@@ -43,7 +44,8 @@ class CategoryResource(Resource):
         db.session.commit()
         return {'message': 'Category created successfully'}, 201
 
-    @auth_required('admin')
+    @auth_required('token')
+    @roles_required('admin')
     def put(self, category_id):
         category = Category.query.get(category_id)
         if not category:
@@ -54,10 +56,13 @@ class CategoryResource(Resource):
         args = parser.parse_args()
         category.name = args['name']
         category.desc = args['desc']
+        if(category.name == None or category.name == ''):
+            return {'message': 'Category name cannot be empty'}, 400
         db.session.commit()
         return {'message': 'Category updated successfully'}, 200
 
-    @auth_required('admin')
+    @auth_required('token')
+    @roles_required('admin')
     def delete(self, category_id):
         category = Category.query.get(category_id)
         if not category:

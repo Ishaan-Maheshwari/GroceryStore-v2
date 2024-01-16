@@ -8,6 +8,8 @@ class Config():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = "ishaan"
     SECURITY_PASSWORD_SALT = "this is salt"
+    WTF_CSRF_ENABLED = False
+    SECURITY_TOKEN_AUTHENTICATION_HEADER = 'Authentication-Token'
     SECURITY_CONFIRMABLE = True
     SECURITY_TRACKABLE = True
 
