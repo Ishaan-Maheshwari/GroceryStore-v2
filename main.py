@@ -48,9 +48,9 @@ def home():
 def do_initial_setup():
     db.create_all()
     admin_role = user_datastore.create_role(name='admin', description='Administrator')
-    user_datastore.create_role(name='customer', description='Customer')
+    user_role = user_datastore.create_role(name='user', description='Customer')
     user_datastore.create_role(name='manager', description='Manager')
-    new_user = user_datastore.create_user(
+    new_admin = user_datastore.create_user(
        username='admin',
        email='admin@grocery.com', 
        password='admin', 
@@ -58,7 +58,16 @@ def do_initial_setup():
        last_name='Admin', 
        telephone='1234567890'
       )
-    user_datastore.add_role_to_user(new_user, admin_role)
+    new_user = user_datastore.create_user(
+       username='ishaan',
+       email='ishaan@grocery.com', 
+       password='123', 
+       first_name='Ishaan', 
+       last_name='Maheshwari', 
+       telephone='1234567890'
+      )
+    user_datastore.add_role_to_user(new_admin, admin_role)
+    user_datastore.add_role_to_user(new_user, user_role)
     import json
     from application.models import Product, Category, Discount
     with open('./db_directory/category.json') as json_file:

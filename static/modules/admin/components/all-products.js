@@ -74,6 +74,7 @@ export default{
             this.$router.push({path:'/admin/product/edit/'+product_id, params:{product_id:product_id}});
         },
         async deleteProduct(product_id){
+            if(!confirm("Are you sure you want to delete this product?")) return;
             const res = await fetch('api/products/'+product_id,
             {
                 method:'DELETE',

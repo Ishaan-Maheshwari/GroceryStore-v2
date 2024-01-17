@@ -5,6 +5,7 @@ export default {
         <h4 class="text-secondary">Enter into the Veggie-land 🍅</h4>
         <hr>
         {{error?error:null}}
+        <form @submit.prevent="login">
         <div class="mb-3 row">
             <!-- <label for="inputName" class="col-4 col-form-label">Username</label> -->
             <div class="col-12">
@@ -21,9 +22,10 @@ export default {
         </div>
         <div class="mb-3 row">
             <div class="col">
-                <button type="submit" class="btn btn-secondary" @click="login">Enter</button>
+                <button type="submit" class="btn btn-secondary" >Enter</button>
             </div>
         </div>
+        </form>
         <a href="">No account ? Create One !</a>
     </div>
     `,
@@ -54,7 +56,7 @@ export default {
             }else if(this.currentUser.role == 'manager'){
                 this.$router.push({path:'/'});
             }else{
-                this.$router.push({path:'/'});
+                this.$router.push({path:'/dashboard'});
             }
         }
     },
@@ -82,8 +84,10 @@ export default {
                 };
                 if(this.currentUser.role == 'admin'){
                     this.$router.push({path:'/admin/home'});
-                }else{
+                }else if(this.currentUser.role == 'manager'){
                     this.$router.push({path:'/'});
+                }else{
+                    this.$router.push({path:'/dashboard'});
                 }
             }else{
                 this.error = data.message

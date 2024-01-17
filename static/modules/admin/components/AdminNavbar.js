@@ -15,13 +15,13 @@ export default{
                             <a class="nav-link text-secondary" href=""><i class="bi bi-graph-up-arrow"></i> Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-secondary" href="#" @click="admin_show_categories"><i class="bi bi-tag-fill"></i> Categories</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve('/admin/categories').href" ><i class="bi bi-tag-fill"></i> Categories</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-secondary" href="#" @click="admin_show_products"><i class="bi bi-flower3"></i> Products</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve('/admin/products').href"><i class="bi bi-flower3"></i> Products</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-secondary" href="#" @click="admin_show_discounts"><i class="bi bi-percent"></i> Offers & Discounts</a>
+                            <a class="nav-link text-secondary" :href="this.$router.resolve('/admin/discounts').href"><i class="bi bi-percent"></i> Offers & Discounts</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-secondary" href="">➕ New Store Manager</a>
@@ -56,28 +56,7 @@ export default{
     },
     methods:{
         async logout(){
-            const error_mssg = null;
-            const logout_success = false;
-            const res = await fetch('api/logout',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authentication-Token':this.currentUser.token
-                }
-            })
-            const data = await res.json()
-            if (res.ok) {
-                console.log(data);
-                localStorage.removeItem('auth-token')
-                localStorage.removeItem('role')
-                localStorage.removeItem('username')
-                this.currentUser = null
-                this.logout_success = true
-            }
-            else{
-                this.error_mssg = data.error
-            }
-            this.$router.push({path:'/logout', params: { error_mssg:this.error_mssg, logout_success: this.logout_success }});
+            this.$router.push({path:'/logout'});
         },
         admin_dashboard(){
             this.$router.push('/admin_dashboard')

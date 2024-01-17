@@ -1,21 +1,29 @@
 import Home from "./components/Home.js"
 import Logout from "./components/Logout.js"
+
 import AdminHome from "../modules/admin/components/admin-home.js"
 import AdminAllProducts from "../modules/admin/components/all-products.js"
 import AdminProductDetails from "../modules/admin/components/product-details.js"
 import AdminCreateProductForm from "../modules/admin/components/product-create-form.js"
 import AdminEditProductForm from "../modules/admin/components/product-edit-form.js"
 import AdminAllCategories from "../modules/admin/components/all-categories.js"
-import AdminAllDiscounts from "../modules/admin/components/all-discounts.js"
 import AdminCategoryProducts from "../modules/admin/components/category-products.js"
 import AdminCreateCategoryForm from "../modules/admin/components/category-create-form.js"
 import AdminEditCategoryForm from "../modules/admin/components/category-edit-form.js"
+import AdminAllDiscounts from "../modules/admin/components/all-discounts.js"
+import AdminCreateDiscountForm from "../modules/admin/components/discount-create-form.js"
+import AdminEditDiscountForm from "../modules/admin/components/discount-edit-form.js"
+
+import UserDashboard from "../modules/user/user-dashboard.js"   
+import AllProductsPage from "../modules/user/all-products.js"
+import AllCategoriesPage from "../modules/user/all-categories.js"
+import CategoryProductsPage from "../modules/user/category-products.js"
 
 
 const routes = [
 
     { path: '/', component: Home},
-    { path: '/logout', component: Logout, props: true},
+    { path: '/logout', component: Logout},
 
     {path: '/admin/home', component: AdminHome, props: true},
     {path: '/admin/products', component: AdminAllProducts},
@@ -29,6 +37,13 @@ const routes = [
     {path: '/admin/category/:category_id/products', component: AdminCategoryProducts, props: true},
 
     {path: '/admin/discounts', component: AdminAllDiscounts},
+    {path: '/admin/discounts/new', component: AdminCreateDiscountForm},
+    {path: '/admin/discounts/edit/:discount_id', component: AdminEditDiscountForm, props: true},
+
+    {path: '/dashboard', component: UserDashboard},
+    {path: '/products', component: AllProductsPage},
+    {path: '/categories', component: AllCategoriesPage},
+    {path: '/category/:category_id/products', component: CategoryProductsPage, props: true},
 ]
 
 export default new VueRouter({

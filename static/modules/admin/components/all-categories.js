@@ -25,8 +25,8 @@ export default{
                         <h3 class="text-primary">{{category.name}}</h3>
                         <p>{{category.desc}}</p>
                         <a class="btn btn-outline-primary" href="#" @click="view_products(category.id); return false;" role="button">Products</a>
-                        <a class="btn btn-info" href="#" @click="editCategory(category.id); return false;" role="button"><i class="bi bi-pencil-fill"></i></a>
-                        <a class="btn btn-danger" href="#" @click="deleteCategory(category.id)" role="button"><i class="bi bi-trash-fill"></i></a>
+                        <a class="btn btn-primary" href="#" @click="editCategory(category.id); return false;" role="button"><i class="bi bi-pencil-fill"></i></a>
+                        <a class="btn btn-secondary" href="#" @click="deleteCategory(category.id)" role="button"><i class="bi bi-trash-fill"></i></a>
                     </div>
                 </div>
             </div>
@@ -66,8 +66,7 @@ export default{
         }
         ,
         async deleteCategory(category_id){
-            // delete category with category_id
-            // if success, remove category from categories array
+            if(!confirm("Are you sure you want to delete this category?")) return;
             const res = await fetch('api/categories/'+category_id, 
             {
                 method:'DELETE',

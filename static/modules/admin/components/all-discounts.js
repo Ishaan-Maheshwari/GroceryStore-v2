@@ -12,11 +12,17 @@ export default{
 
         <div class="container px-4">
             <div class="row">
-                <a class="btn btn-primary text-white" href="" role="button">➕ Add New Discount</a>
+                <a class="btn btn-primary text-white" :href="this.$router.resolve({path:'/admin/discounts/new'}).href" role="button">➕ Add New Discount</a>
             </div>
         </div>
         <br>
         <div class="container">
+            <div class="row">
+                <div v-for="error in errors" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> {{error}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
             <div class="row">
                 <table class="table table-striped table-inverse table-responsive text-align-center">
                     <thead class="thead-inverse">
@@ -37,9 +43,10 @@ export default{
                             <td v-if="discount.is_active" class="text-sucess">Active</td>
                             <td v-else class="text-danger">Not Active</td>
                             <td>
-                                <a class="btn btn-primary text-white" href=""
+                                <a class="btn btn-primary text-white" :href="$router.resolve({path:'/admin/discounts/edit/'+discount.id}).href"
                                     role="button">Edit</a>
-                                <a class="btn btn-danger text-white" href=""
+                                <a class="btn btn-danger text-white" href="#"
+                                    @click="deleteDiscount(discount.id)"
                                     role="button">Delete</a>
                             </td>
                         </tr>
@@ -52,7 +59,8 @@ export default{
     `,
     data(){
         return{
-            discounts:[]
+            discounts:[],
+            errors: []
         }
     },
     components:{
@@ -68,7 +76,25 @@ export default{
             if(res.ok){
                 this.discounts = data;
             }else{
+                this.errors.push(data.message);
                 console.log(data)
+            }
+        },
+        async deleteDiscount(discount_id){
+            if(!confirm("Are you sure you want to delete this discount?")) return;
+            const res = await fetch('api/discounts/'+discount_id, 
+            {
+                method:'DELETE',
+                headers:{
+                    'Authentication-Token':localStorage.getItem('auth-token')
+                }
+            });
+            const data = await res.json();
+            if(res.ok){
+                this.fetchDiscounts();
+            }else{
+                this.errors.push(data.message);
+                console.log(data);
             }
         }
     }
