@@ -1,5 +1,3 @@
-// TODO: view products in that category
-
 export default {
     name: 'CategoryCard',
     props: ['category'],

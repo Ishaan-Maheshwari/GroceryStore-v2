@@ -16,8 +16,10 @@ import AdminEditDiscountForm from "../modules/admin/components/discount-edit-for
 
 import UserDashboard from "../modules/user/user-dashboard.js"   
 import AllProductsPage from "../modules/user/all-products.js"
+import ProductDetailsPage from "../modules/user/product-details.js"
 import AllCategoriesPage from "../modules/user/all-categories.js"
 import CategoryProductsPage from "../modules/user/category-products.js"
+import UserProfilePage from "../modules/user/profile-page.js"
 
 
 const routes = [
@@ -42,8 +44,10 @@ const routes = [
 
     {path: '/dashboard', component: UserDashboard},
     {path: '/products', component: AllProductsPage},
+    {path: '/product/:product_id', component: ProductDetailsPage, props: true},
     {path: '/categories', component: AllCategoriesPage},
     {path: '/category/:category_id/products', component: CategoryProductsPage, props: true},
+    {path: '/profile', component: UserProfilePage},
 ]
 
 export default new VueRouter({

@@ -9,8 +9,8 @@ export default {
             <div class="row">
                 <div class="col-md-12">
                     <div class="jumbotron">
-                        <h1 class="display-4">Welcome to Admin Dashboard</h1>
-                        <p class="lead">Manage your store from here.</p>
+                        <h1 class="display-4">Welcome to User Dashboard</h1>
+                        <p class="lead">Start Your shopping from here.</p>
                     </div>
                 </div>
             </div>

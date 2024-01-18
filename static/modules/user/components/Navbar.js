@@ -25,7 +25,7 @@ export default {
                     <a class="nav-link text-secondary" href="#"><i class="bi bi-cart3"></i> cart </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-secondary" href="#"><i class="bi bi-person-circle"></i> {{username}}</a>
+                    <a class="nav-link text-secondary" :href="$router.resolve({path : '/profile'}).href"><i class="bi bi-person-circle"></i> {{username}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-secondary" href="#/logout"> <i class="bi bi-box-arrow-right"></i>  logout</a>

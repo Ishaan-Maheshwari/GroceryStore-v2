@@ -1,4 +1,5 @@
 from flask import current_app as app, request
+from flask_login import current_user
 from flask_security import auth_required, http_auth_required, login_user, logout_user, roles_accepted, verify_password
 from application.models import user_datastore
 from application.database import db
@@ -110,3 +111,23 @@ def get_products_by_category(category_id):
         return {"products": product_details}, 200
     else:
         return {"message" : "Something went wrong. Cannot fetch products."}, 401
+
+@app.get("/api/common/user_details/<int:user_id>")
+@auth_required('token')
+def get_user_details(user_id):
+    if user_id != current_user.id:
+        return {"message": "You are not authorized to access this resource. You cannot view other user details"}, 401
+    user = user_datastore.find_user(id=user_id)
+    if user:
+        return {"user_details": {
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "is_active": user.active,
+                "role": user.roles[0].name,
+                "telephone": user.telephone,
+                "id": user.id
+            }}, 200
+    else:
+        return {"message" : "Something went wrong. Cannot fetch user details."}, 401
