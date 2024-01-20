@@ -21,6 +21,11 @@ export default{
         </div>
     </div>
     `,
+    data(){
+        return {
+            isOutOfStock : false
+        }
+    },
     created(){
         if(this.product.inventory == 0){
             this.isOutOfStock = true;

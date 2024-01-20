@@ -34,11 +34,9 @@ export default{
         </div>
     </div>
     `,
-    computed() {
-        return {
-            total_price() {
-                return this.item.sell_price * this.item.quantity;
-            }
-        }
+    computed: {
+        total_price() {
+            return this.item.sell_price * this.item.quantity;
+        } 
     }
 }

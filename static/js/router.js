@@ -46,9 +46,11 @@ const routes = [
     {path: '/admin/discounts/edit/:discount_id', component: AdminEditDiscountForm, props: true},
 
     {path: '/dashboard', component: UserDashboard},
-    {path: '/products', component: AllProductsPage},
+    {path: '/products', component: AllProductsPage, props: true},
+    {path: '/products/:like', component: AllProductsPage, props: true},
     {path: '/product/:product_id', component: ProductDetailsPage, props: true},
-    {path: '/categories', component: AllCategoriesPage},
+    {path: '/categories', component: AllCategoriesPage, props: true},
+    {path: '/categories/:like', component: AllCategoriesPage, props: true},
     {path: '/category/:category_id/products', component: CategoryProductsPage, props: true},
     {path: '/profile', component: UserProfilePage},
     {path: '/cart', component: CartPage},

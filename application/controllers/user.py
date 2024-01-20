@@ -1,8 +1,91 @@
 from flask import current_app as app, request
 from flask_login import current_user
 from flask_security import auth_required, login_user, roles_accepted, verify_password
-from application.models import CartItem, Discount, OrderDetails, OrderItems, Product, ShoppingSession, user_datastore
+from application.models import CartItem, Category, Discount, OrderDetails, OrderItems, Product, ShoppingSession, user_datastore
 from application.database import db
+
+def new_products(num=8):
+    #get 10 products with category and discount details with latest created_on date  by query and return
+    products = []
+    try:
+        res = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).order_by(Product.created_on.desc()).limit(num).all()
+        for product in res:
+            products.append({
+                    "product_id": product.Product.id,
+                    "product_name": product.Product.name,
+                    "product_desc": product.Product.desc,
+                    "category": product.Category.name,
+                    "category_id": product.Category.id,
+                    "inventory": product.Product.inventory,
+                    "discount_perc": product.Discount.discount_percent,
+                    "discount_id": product.Discount.id,
+                    "discount_name": product.Discount.name,
+                    "discount_desc": product.Discount.desc,
+                    "price": product.Product.price,
+                    "manf_date": product.Product.manf_date
+                })
+    except Exception as e:
+        print(e)
+    return products
+        
+def get_popular_products(num=8):
+    #get product ids of order_items with highest sum of quantities by query and return
+    product_ids = []
+    products = []
+    try:
+        product_details = db.session.query(OrderItems.product_id).group_by(OrderItems.product_id).order_by(db.func.sum(OrderItems.quantity).desc()).limit(num).all()
+        if product_details is not None:
+            product_ids = [product[0] for product in product_details]
+            res = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.id.in_(product_ids)).all()
+            for product in res:
+                products.append({
+                    "product_id": product.Product.id,
+                    "product_name": product.Product.name,
+                    "product_desc": product.Product.desc,
+                    "category": product.Category.name,
+                    "category_id": product.Category.id,
+                    "inventory": product.Product.inventory,
+                    "discount_perc": product.Discount.discount_percent,
+                    "discount_id": product.Discount.id,
+                    "discount_name": product.Discount.name,
+                    "discount_desc": product.Discount.desc,
+                    "price": product.Product.price,
+                    "manf_date": product.Product.manf_date
+                })
+    except Exception as e:
+        print(e)
+    return products
+
+def get_high_discounted_items(num=8):
+    #get discount_ids of products with highest discount by query and return
+    discount_ids = []
+    products = []
+    try:
+        #get discount ids with highest discount by query
+        discounts = Discount.query.filter(Discount.discount_percent > 0).order_by(Discount.discount_percent.desc()).limit(2).all()
+        if discounts is not None:
+            discount_ids = [discount.id for discount in discounts]
+        if discount_ids is not None:
+            #get product details of all products with above discount ids with category and discount details by query and return
+            res = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.discount_id.in_(discount_ids)).limit(num).all()
+            for product in res:
+                products.append({
+                    "product_id": product.Product.id,
+                    "product_name": product.Product.name,
+                    "product_desc": product.Product.desc,
+                    "category": product.Category.name,
+                    "category_id": product.Category.id,
+                    "inventory": product.Product.inventory,
+                    "discount_perc": product.Discount.discount_percent,
+                    "discount_id": product.Discount.id,
+                    "discount_name": product.Discount.name,
+                    "discount_desc": product.Discount.desc,
+                    "price": product.Product.price,
+                    "manf_date": product.Product.manf_date
+                })
+    except Exception as e:
+        print(e)
+    return products
 
 #user register
 @app.route("/user/register", methods=['POST'])
@@ -243,6 +326,7 @@ def checkout():
                             
                             order_item = OrderItems(order_id=order_details.id, 
                                                     name=product.name,
+                                                    product_id = product.id,
                                                     desc=product.desc,
                                                     sell_price=sell_price,
                                                     manf_date=product.manf_date,
@@ -300,6 +384,7 @@ def get_order_details(order_id):
                     items.append({
                         "id": order_item.id,
                         "name": order_item.name,
+                        "product_id": order_item.product_id,
                         "desc": order_item.desc,
                         "sell_price": order_item.sell_price,
                         "manf_date": order_item.manf_date,
@@ -320,3 +405,14 @@ def get_order_details(order_id):
     except Exception as e:
         print(e)
         return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.route("/api/user/home", methods=["GET"])
+@auth_required('token')
+@roles_accepted('user')
+def user_dashboard():
+    latest_products = new_products(num=4)
+    popular_products = get_popular_products(num=4)
+    discounted_products = get_high_discounted_items(num=8)
+    return {"latest_products": latest_products, 
+            "popular_products": popular_products, 
+            "discounted_products": discounted_products}, 200

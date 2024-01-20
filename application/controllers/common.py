@@ -130,3 +130,53 @@ def get_user_details(user_id):
             }}, 200
     else:
         return {"message" : "Something went wrong. Cannot fetch user details."}, 401
+
+@app.get("/api/search/products/<search_term>")
+def search_products(search_term):
+    products = []
+    try:
+        products = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.name.like('%' + search_term + '%')).all()
+        if not products:
+            products = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.desc.like('%' + search_term + '%')).all()
+        product_details = []
+        if products:
+            for product in products:
+                product_details.append({
+                    "product_id": product.Product.id,
+                    "product_name": product.Product.name,
+                    "product_desc": product.Product.desc,
+                    "category": product.Category.name,
+                    "category_id": product.Category.id,
+                    "inventory": product.Product.inventory,
+                    "discount_perc": product.Discount.discount_percent,
+                    "discount_id": product.Discount.id,
+                    "discount_name": product.Discount.name,
+                    "discount_desc": product.Discount.desc,
+                    "price": product.Product.price,
+                    "manf_date": product.Product.manf_date
+                })
+            return {"products": product_details}, 200
+        else:
+            return {"message" : "No Products found similar to {search_term}"}, 404
+    except Exception as e:
+        return {"message" : "Something went wrong. Cannot fetch products."}, 401
+
+@app.get("/api/search/categories/<search_term>")
+def search_categories(search_term):
+    categories = []
+    try:
+        categories = Category.query.filter(Category.name.like('%' + search_term + '%')).all()
+        if not categories:
+            categories = Category.query.filter(Category.desc.like('%' + search_term + '%')).all()
+            if not categories:
+                return {"message" : "No categories found"}, 404
+        category_details = []
+        for category in categories:
+            category_details.append({
+                "id": category.id,
+                "name": category.name,
+                "desc": category.desc,
+            })
+        return {"categories": category_details}, 200
+    except Exception as e:
+        return {"message" : "Something went wrong. Cannot fetch categories."}, 401
