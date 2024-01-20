@@ -21,21 +21,21 @@ export default {
                 <div class="col-md-4">   
                         
                     <ul class="list-group">
-                        <router-link tag="li" class="list-group-item" :to="$router.resolve({path : '/profile'}).href">
+                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/profile'}).href">
                             <i class="bi bi-pencil-square"></i> Edit Profile
-                        </router-link>
-                        <router-link tag="li" class="list-group-item" :to="$router.resolve({path : '/profile'}).href">
+                        </a>
+                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/profile'}).href">
                             <i class="bi bi-key"></i> Change Password
-                        </router-link>
-                        <router-link tag="li" class="list-group-item" :to="$router.resolve({path : '/profile'}).href">
+                        </a>
+                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/profile'}).href">
                             <i class="bi bi-trash"></i> Delete Profile
-                        </router-link>
-                        <router-link tag="li" class="list-group-item" :to="$router.resolve({path : '/profile'}).href">
+                        </a>
+                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/myorders'}).href">
                             <i class="bi bi-box-seam"></i> Orders
-                        </router-link>
-                        <router-link tag="li" class="list-group-item" :to="$router.resolve({path : '/profile'}).href">
+                        </a>
+                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/cart'}).href">
                             <i class="bi bi-cart3"></i> Cart
-                        </router-link>
+                        </a>
                     </ul>
                     
                 </div>

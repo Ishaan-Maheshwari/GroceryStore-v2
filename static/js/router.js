@@ -20,6 +20,9 @@ import ProductDetailsPage from "../modules/user/product-details.js"
 import AllCategoriesPage from "../modules/user/all-categories.js"
 import CategoryProductsPage from "../modules/user/category-products.js"
 import UserProfilePage from "../modules/user/profile-page.js"
+import CartPage from "../modules/user/cart-page.js"
+import OrderPage from "../modules/user/order-page.js"
+import OrderDetailsPage from "../modules/user/order-details-page.js"
 
 
 const routes = [
@@ -48,6 +51,9 @@ const routes = [
     {path: '/categories', component: AllCategoriesPage},
     {path: '/category/:category_id/products', component: CategoryProductsPage, props: true},
     {path: '/profile', component: UserProfilePage},
+    {path: '/cart', component: CartPage},
+    {path: '/myorders', component: OrderPage},
+    {path: '/myorder/:order_id', component: OrderDetailsPage, props: true},
 ]
 
 export default new VueRouter({

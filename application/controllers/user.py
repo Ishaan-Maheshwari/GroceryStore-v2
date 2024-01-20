@@ -1,6 +1,8 @@
 from flask import current_app as app, request
-from flask_security import login_user, verify_password
-from application.models import user_datastore
+from flask_login import current_user
+from flask_security import auth_required, login_user, roles_accepted, verify_password
+from application.models import CartItem, Discount, OrderDetails, OrderItems, Product, ShoppingSession, user_datastore
+from application.database import db
 
 #user register
 @app.route("/user/register", methods=['POST'])
@@ -73,3 +75,248 @@ def user_logout():
             return {"message": "Logout successful"}, 200
         else:
             return {"message": "User not found"}, 404
+
+@app.post("/api/cart/add")
+@auth_required('token')
+@roles_accepted('user')
+def add_to_cart():
+    try:
+        request_data = request.get_json()
+        product_id = request_data['product_id']
+        # check if product id is valid and is an integer
+        if not product_id or not isinstance(product_id, int):
+            return {"message": "Invalid product id", "status": "Failed"}, 400
+        #check if product exists and is not out of stock
+        product = Product.query.filter_by(id=product_id).first()
+        if not (product and product.inventory > 0):
+            return {"message": "Product not available or Out of Stock", "status": "Failed"}, 404
+        #check if any shopping session exists for the user
+        shopping_session = db.session.query(ShoppingSession).filter(ShoppingSession.user_id == current_user.id).first()
+        if not shopping_session:
+            #create a new shopping session
+            new_shopping_session = ShoppingSession(user_id=current_user.id, total_amount = 0)
+            db.session.add(new_shopping_session)
+            db.session.commit()
+            shopping_session = db.session.query(ShoppingSession).filter(ShoppingSession.user_id == current_user.id).first()
+        #check if the product is already in the CartItem table with same shopping session id and product id
+        cart_item = db.session.query(CartItem).filter(CartItem.session_id == shopping_session.id).filter(CartItem.product_id == product_id).first()
+        if cart_item:
+            #update the quantity in the cart item
+            cart_item.quantity += 1
+        else:
+            #create a new cart item
+            cart_item = CartItem(session_id=shopping_session.id, product_id=product_id, quantity=1)
+            db.session.add(cart_item)
+        #fetch discount for the product
+        discount = Discount.query.filter_by(id=product.discount_id).first()
+        #update the total amount in the shopping session
+        shopping_session.total_amount += (product.price - (product.price * discount.discount_percent / 100))
+
+        db.session.commit()
+        return {"message": "Product added to cart successfully", "status": "Success"}, 200
+    except Exception as e:
+        return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.get("/api/cart/details")
+@auth_required('token')
+@roles_accepted('user')
+def cart_details():
+    try:
+        shopping_session = db.session.query(ShoppingSession).filter(ShoppingSession.user_id == current_user.id).first()
+        cart_items = []
+        if shopping_session:
+            cart_items = db.session.query(CartItem, Product, Discount).filter(CartItem.session_id == shopping_session.id).filter(CartItem.product_id == Product.id).filter(Product.discount_id == Discount.id).all()
+            if not cart_items:
+                return {"message": "No items in cart", "status": "Failed"}, 404
+        else:
+            return {"message": "No items in cart", "status": "Failed"}, 404
+        items = []
+        total_amount = 0
+        for cart_item in cart_items:
+            items.append({
+                "id": cart_item[0].id,
+                "product_id": cart_item[1].id,
+                "product_name": cart_item[1].name,
+                "product_description": cart_item[1].desc,
+                "price": cart_item[1].price,
+                "discount_percent": cart_item[2].discount_percent,
+                "quantity": cart_item[0].quantity,
+                "discounted_price": cart_item[1].price - (cart_item[1].price * cart_item[2].discount_percent / 100),
+                "total_price": (cart_item[1].price - (cart_item[1].price * cart_item[2].discount_percent / 100)) * cart_item[0].quantity
+            })
+            total_amount += (cart_item[1].price - (cart_item[1].price * cart_item[2].discount_percent / 100)) * cart_item[0].quantity
+        shopping_session.total_amount = total_amount
+        db.session.commit()
+        return {"items": items, "total_amount": total_amount, "status": "Success"}, 200
+    
+    except Exception as e:
+        return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.post("/api/cart/reduce/")
+@auth_required('token')
+@roles_accepted('user')
+def reduce_from_cart():
+    try:
+        request_data = request.get_json()
+        cart_item_id = request_data['cart_item_id']
+        if not cart_item_id or not isinstance(cart_item_id, int):
+            return {"message": "Invalid cart item id", "status": "Failed"}, 400
+        cart_item = CartItem.query.filter_by(id=cart_item_id).first()
+        if cart_item:
+            shopping_session = db.session.query(ShoppingSession).filter(ShoppingSession.id == cart_item.session_id).first()
+            if shopping_session:
+                print("this is cart  item ID : ",cart_item.product_id)
+                product = Product.query.filter_by(id=cart_item.product_id).first()
+                if product:
+                    discount = Discount.query.filter_by(id=product.discount_id).first()
+                    shopping_session.total_amount -= (cart_item.quantity *(product.price - (product.price * discount.discount_percent / 100)))
+                    if cart_item.quantity > 1:
+                        cart_item.quantity -= 1
+                    else:  
+                        db.session.delete(cart_item)
+                    db.session.commit()
+                    return {"message": "Product removed from cart successfully", "status": "Success"}, 200
+                else:
+                    return {"message": "Product not found", "status": "Failed"}, 404
+            else:
+                return {"message": "Shopping session not found", "status": "Failed"}, 404
+        else:
+            return {"message": "Product not found", "status": "Failed"}, 404
+    except Exception as e:
+        return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.post("/api/cart/remove/")
+@auth_required('token')
+@roles_accepted('user')
+def remove_from_cart():
+    try:
+        request_data = request.get_json()
+        cart_item_id = request_data['cart_item_id']
+        if not cart_item_id or not isinstance(cart_item_id, int):
+            return {"message": "Invalid cart item id", "status": "Failed"}, 400
+        cart_item = CartItem.query.filter_by(id=cart_item_id).first()
+        if cart_item:
+            shopping_session = db.session.query(ShoppingSession).filter(ShoppingSession.id == cart_item.session_id).first()
+            if shopping_session:
+                print("this is cart  item ID : ",cart_item.product_id)
+                product = Product.query.filter_by(id=cart_item.product_id).first()
+                if product:
+                    discount = Discount.query.filter_by(id=product.discount_id).first()
+                    shopping_session.total_amount -= (cart_item.quantity *(product.price - (product.price * discount.discount_percent / 100))) * cart_item.quantity 
+                    db.session.delete(cart_item)
+                    db.session.commit()
+                    return {"message": "Product removed from cart successfully", "status": "Success"}, 200
+                else:
+                    return {"message": "Product not found", "status": "Failed"}, 404
+            else:
+                return {"message": "Shopping session not found", "status": "Failed"}, 404
+        else:
+            return {"message": "Product not found", "status": "Failed"}, 404
+    except Exception as e:
+        return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.post("/api/cart/checkout/")
+@auth_required('token')
+@roles_accepted('user')
+def checkout():
+    try:
+        address = request.get_json()['address']
+        shopping_session = db.session.query(ShoppingSession).filter(ShoppingSession.user_id == current_user.id).first()
+        if shopping_session:
+            cart_items = db.session.query(CartItem, Product).filter(CartItem.session_id == shopping_session.id).filter(CartItem.product_id == Product.id).all()
+            if cart_items:
+                order_details = OrderDetails(user_id=current_user.id, total=0, address=address)
+                db.session.add(order_details)
+                db.session.commit()
+                order_details = db.session.query(OrderDetails).filter(OrderDetails.user_id == current_user.id).order_by(OrderDetails.id.desc()).first()
+                for cart_item, product in cart_items:
+                    if product:
+                        if product.inventory < cart_item.quantity:
+                            return {"message": "Product " + product.name + " is out of stock", "status": "Failed"}, 404
+                        else:
+                            product.inventory -= cart_item.quantity
+                            discount = Discount.query.filter_by(id=product.discount_id).first()
+                            discount_failed_flag = False
+                            if not discount:
+                                discount_failed_flag = True
+                            sell_price = product.price - (product.price * discount.discount_percent / 100)       
+                            
+                            order_item = OrderItems(order_id=order_details.id, 
+                                                    name=product.name,
+                                                    desc=product.desc,
+                                                    sell_price=sell_price,
+                                                    manf_date=product.manf_date,
+                                                    quantity=cart_item.quantity)
+                            db.session.add(order_item)
+                            db.session.delete(cart_item)
+                            db.session.commit()
+                order_details.total=shopping_session.total_amount
+                shopping_session.total_amount = 0
+                db.session.commit()
+                if discount_failed_flag:
+                    return {"message": "Checkout successful but failed to apply some discounts.", "status": "Success"}, 200
+                return {"message": "Checkout successful", "status": "Success"}, 200
+            else:
+                return {"message": "No items in cart", "status": "Failed"}, 404
+        else:
+            return {"message": "No items in cart", "status": "Failed"}, 404
+    except Exception as e:
+        return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.get("/api/user/orders/")
+@auth_required('token')
+@roles_accepted('user')
+def show_orders():
+    try:
+        res_objs = db.session.query(OrderDetails).filter(OrderDetails.user_id == current_user.id).order_by(OrderDetails.id.desc()).all()
+        if res_objs:
+            orders = []
+            for res_obj in res_objs:
+                orders.append({
+                    "id": res_obj.id,
+                    "total": res_obj.total,
+                    "date": res_obj.created_on.strftime("%d-%m-%Y"),
+                    "time" : res_obj.created_on.strftime("%H:%M:%S"),
+                    "address": res_obj.address,
+                })
+            return {"orders": orders, "message": "Orders found", "status": "Success"}, 200
+        else:
+            return {"message": "No orders found", "status": "Failed"}, 404
+    except Exception as e:
+        print(e)
+        return {"message": "Something went wrong", "status": "Failed"}, 500
+
+@app.get("/api/order/<int:order_id>")
+@auth_required('token')
+@roles_accepted('user')
+def get_order_details(order_id):
+    try:
+        res_obj = db.session.query(OrderDetails).filter(OrderDetails.id == order_id).filter(OrderDetails.user_id == current_user.id).first()
+        if res_obj:
+            order_items = db.session.query(OrderItems).filter(OrderItems.order_id == order_id).all()
+            if order_items:
+                items = []
+                for order_item in order_items:
+                    items.append({
+                        "id": order_item.id,
+                        "name": order_item.name,
+                        "desc": order_item.desc,
+                        "sell_price": order_item.sell_price,
+                        "manf_date": order_item.manf_date,
+                        "quantity": order_item.quantity,
+                    })
+                return {"order_details": {
+                    "id": res_obj.id,
+                    "total": res_obj.total,
+                    "date": res_obj.created_on.strftime("%d-%m-%Y"),
+                    "time" : res_obj.created_on.strftime("%H:%M:%S"),
+                    "address": res_obj.address,
+                    "items": items
+                }, "message": "Order found", "status": "Success"}, 200
+            else:
+                return {"message": "No items in order", "status": "Failed"}, 404
+        else:
+            return {"message": "Order not found", "status": "Failed"}, 404
+    except Exception as e:
+        print(e)
+        return {"message": "Something went wrong", "status": "Failed"}, 500

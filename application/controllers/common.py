@@ -37,7 +37,6 @@ def login():
 
 @app.post("/api/logout")
 @auth_required('token')
-@roles_accepted('admin', 'manager', 'user')
 def logout():
     if request.method == 'POST':
         logout_user()

@@ -16,8 +16,8 @@ export default{
             <p v-else >{{ product.inventory}} <i> available in stock. </i></p>
             <a class="btn btn-outline-primary" :href="$router.resolve({path:'/product/'+product.product_id}).href" role="button"><i class="bi bi-info-circle-fill"></i> Info </a>
             &nbsp;&nbsp;
-            <a v-if="isOutOfStock" class="btn btn-outline-danger disabled" @click="" role="button">Out of Stock</a>
-            <a v-else class="btn btn-success text-white " @click="" role="button">Add to Cart</a>
+            <a v-if="isOutOfStock" class="btn btn-outline-danger disabled" role="button">Out of Stock</a>
+            <a v-else class="btn btn-success text-white " @click="addToCart(product.product_id)" role="button">Add to Cart</a>
         </div>
     </div>
     `,
@@ -31,4 +31,26 @@ export default{
             return this.product.product_details;
         }
     },
+    methods : {
+        async addToCart(product_id){
+            let response = await fetch('/api/cart/add',{
+                method:'POST',
+                headers:{
+                    'Authentication-Token':localStorage.getItem('auth-token'),
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    product_id:product_id
+                })
+            });
+            let result = await response.json();
+            if(result.status == 'Success'){
+                console.log(result.message);
+                alert(result.message);
+            }else{
+                console.log(result.message);
+                alert(result.message);
+            }
+        }
+    }
 }

@@ -19,10 +19,10 @@ export default {
                     <a class="nav-link text-secondary" :href="$router.resolve('/products').href"><i class="bi bi-flower3"></i> Products</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-secondary" href="#"><i class="bi bi-box-seam-fill"></i> Orders </a>
+                    <a class="nav-link text-secondary" :href="$router.resolve({path : '/myorders'}).href"><i class="bi bi-box-seam-fill"></i> Orders </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-secondary" href="#"><i class="bi bi-cart3"></i> cart </a>
+                    <a class="nav-link text-secondary" :href="$router.resolve({path : '/cart'}).href"><i class="bi bi-cart3"></i> cart </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-secondary" :href="$router.resolve({path : '/profile'}).href"><i class="bi bi-person-circle"></i> {{username}}</a>
