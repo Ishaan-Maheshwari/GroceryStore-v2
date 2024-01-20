@@ -1,5 +1,6 @@
 import BasicNavbar from './BasicNavbar.js'
 import Login from './Login.js'
+import RegistrationForm from './RegistrationForm.js'
 
 export default{
     name:'Home',
@@ -10,7 +11,8 @@ export default{
         <div class="row justify-content-center">
 
             <div class="col-md-6 p-2 order-md-1">
-                <Login/>
+                <Login v-if="loginVisible" @showRegister="showRegister" />
+                <RegistrationForm v-if="registerVisible" @registered="showLogin" />
             </div>
 
             <div class="col-md-6 p-2">
@@ -46,19 +48,25 @@ export default{
     </div>
     </div>
     `,
+    data(){
+        return{
+            loginVisible:true,
+            registerVisible:false
+        }
+    },
     components:{
         BasicNavbar,
-        Login
+        Login,
+        RegistrationForm
     },
-    created(){
-        const token = localStorage.getItem('auth-token')
-        const role = localStorage.getItem('role')
-        const username = localStorage.getItem('username')
-        if(token){
-            this.currentUser = {
-                "role":role,
-                "username":username
-            }
+    methods:{
+        showLogin(){
+            this.loginVisible = true;
+            this.registerVisible = false;
+        },
+        showRegister(){
+            this.loginVisible = false;
+            this.registerVisible = true;
         }
     }
 }

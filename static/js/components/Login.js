@@ -4,7 +4,9 @@ export default {
     <div class="container py-3 border border-secondary rounded">
         <h4 class="text-secondary">Enter into the Veggie-land 🍅</h4>
         <hr>
-        {{error?error:null}}
+        <div v-if="error" class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
         <form @submit.prevent="login">
         <div class="mb-3 row">
             <!-- <label for="inputName" class="col-4 col-form-label">Username</label> -->
@@ -26,7 +28,7 @@ export default {
             </div>
         </div>
         </form>
-        <a href="">No account ? Create One !</a>
+        <a href="#" @click="emitRegisterEvent" >No account ? Create One !</a>
     </div>
     `,
     data(){
@@ -54,7 +56,7 @@ export default {
             if(this.currentUser.role == 'admin'){
                 this.$router.push({path:'/admin/home'});
             }else if(this.currentUser.role == 'manager'){
-                this.$router.push({path:'/'});
+                this.$router.push({path:'/admin/home'});
             }else{
                 this.$router.push({path:'/dashboard'});
             }
@@ -92,6 +94,9 @@ export default {
             }else{
                 this.error = data.message
             }
+        },
+        emitRegisterEvent(){
+            this.$emit('showRegister');
         }
     }
 }

@@ -88,9 +88,9 @@ def get_high_discounted_items(num=8):
     return products
 
 #user register
-@app.route("/user/register", methods=['POST'])
+@app.post("/api/user/register")
 def user_register():
-    if request.method == 'POST':
+    try:
         request_data = request.get_json()
         user_role = user_datastore.find_role('user')
         if user_role == None:
@@ -113,13 +113,10 @@ def user_register():
         )
         user_datastore.add_role_to_user(new_user,user_role)
         user_datastore.commit()
-        return {
-            "message":"Successfully registered as User.",
-            "email" : new_user.email,
-            "username": new_user.username,
-            "role": "User",
-            "Active": new_user.active
-        },201
+        return {"message":"Successfully registered as User."},201
+    except Exception as e:
+        print(e)
+        return {"message":"Something went wrong."},500
     
 #user login
 @app.route("/user/login", methods=['POST'])
