@@ -87,7 +87,7 @@ export default {
                 if(this.currentUser.role == 'admin'){
                     this.$router.push({path:'/admin/home'});
                 }else if(this.currentUser.role == 'manager'){
-                    this.$router.push({path:'/'});
+                    this.$router.push({path:'/admin/home'});
                 }else{
                     this.$router.push({path:'/dashboard'});
                 }

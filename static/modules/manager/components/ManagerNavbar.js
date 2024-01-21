@@ -1,7 +1,5 @@
-// Description: Navbar component which is used to display the navbar in the admin dashboard
-
 export default{
-    name:'Navbar',
+    name:'ManagerNavbar',
     template:`
         <nav class="navbar navbar-expand-md navbar-light sticky-top" style="background-color: #e3f2fd;">
             <div class="container-fluid">

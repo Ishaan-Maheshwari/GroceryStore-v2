@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
-from flask_security import auth_required, roles_required
+from flask_security import auth_required, roles_accepted, roles_required
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
@@ -34,7 +34,7 @@ class DiscountResource(Resource):
             return result, 200
 
     @auth_required('token')
-    @roles_required('admin')
+    @roles_accepted('admin', 'manager')
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
@@ -42,6 +42,12 @@ class DiscountResource(Resource):
         parser.add_argument('discount_percent', type=float, required=True)
         parser.add_argument('is_active', type=bool, required=True)
         args = parser.parse_args()
+        if args['discount_percent'] > 100 or args['discount_percent'] < 0:
+            return {'message': 'Invalid discount_percent'}, 400
+        if args['is_active'] not in [True, False]:
+            return {'message': 'Invalid is_active'}, 400
+        if args['name'] == '':
+            return {'message': 'Invalid name. Cannot be empty.'}, 400
         new_discount = Discount(
             name=args['name'],
             desc=args['desc'],
@@ -53,7 +59,7 @@ class DiscountResource(Resource):
         return {'message': 'Discount created successfully'}, 201
 
     @auth_required('token')
-    @roles_required('admin')
+    @roles_accepted('admin', 'manager')
     def put(self, discount_id):
         discount = Discount.query.get(discount_id)
         if not discount:
@@ -72,7 +78,7 @@ class DiscountResource(Resource):
         return {'message': 'Discount updated successfully'}, 200
 
     @auth_required('token')
-    @roles_required('admin')
+    @roles_accepted('admin', 'manager')
     def delete(self, discount_id):
         discount = Discount.query.get(discount_id)
         if not discount:

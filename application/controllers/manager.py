@@ -2,11 +2,11 @@ from flask import current_app as app, request
 from flask_security import login_user, verify_password
 from application.models import user_datastore
 
-@app.route("/manager/register", methods=['POST'])
+@app.post("/api/manager/register")
 def manager_register():
-    if request.method == 'POST':
+    try:
         request_data = request.get_json()
-        manager_role = user_datastore.find_role('manager')
+        manager_role = user_datastore.find_or_create_role('manager')
         if manager_role == None:
             return {"message":"Manager role not available."},200
         new_manager = user_datastore.create_user(
@@ -27,6 +27,9 @@ def manager_register():
             "role": "Manager",
             "Active": new_manager.active
         },201
+    except Exception as e:
+        print
+        return {"message":"Something went wrong."},500
 
 @app.route("/manager/login", methods=['POST'])
 def manager_login():

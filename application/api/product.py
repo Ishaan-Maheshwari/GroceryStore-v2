@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
-from flask_security import auth_required, roles_required
+from flask_security import auth_required, roles_accepted, roles_required
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
@@ -40,7 +40,7 @@ class ProductResource(Resource):
             return result, 200
 
     @auth_required('token')
-    @roles_required('admin')
+    @roles_accepted('admin', 'manager')
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
@@ -70,7 +70,7 @@ class ProductResource(Resource):
         return {'message': 'Product created successfully'}, 201
 
     @auth_required('token')
-    @roles_required('admin')
+    @roles_accepted('admin', 'manager')
     def put(self, product_id):
         product = Product.query.get(product_id)
         if not product:
@@ -100,7 +100,7 @@ class ProductResource(Resource):
         return {'message': 'Product updated successfully'}, 200
 
     @auth_required('token')
-    @roles_required('admin')
+    @roles_accepted('admin', 'manager')
     def delete(self, product_id):
         product = Product.query.get(product_id)
         if not product:

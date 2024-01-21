@@ -5,7 +5,6 @@ from application.models import CartItem, Category, Discount, OrderDetails, Order
 from application.database import db
 
 def new_products(num=8):
-    #get 10 products with category and discount details with latest created_on date  by query and return
     products = []
     try:
         res = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).order_by(Product.created_on.desc()).limit(num).all()
@@ -29,7 +28,6 @@ def new_products(num=8):
     return products
         
 def get_popular_products(num=8):
-    #get product ids of order_items with highest sum of quantities by query and return
     product_ids = []
     products = []
     try:
@@ -57,16 +55,13 @@ def get_popular_products(num=8):
     return products
 
 def get_high_discounted_items(num=8):
-    #get discount_ids of products with highest discount by query and return
     discount_ids = []
     products = []
     try:
-        #get discount ids with highest discount by query
         discounts = Discount.query.filter(Discount.discount_percent > 0).order_by(Discount.discount_percent.desc()).limit(2).all()
         if discounts is not None:
             discount_ids = [discount.id for discount in discounts]
         if discount_ids is not None:
-            #get product details of all products with above discount ids with category and discount details by query and return
             res = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.discount_id.in_(discount_ids)).limit(num).all()
             for product in res:
                 products.append({
@@ -87,7 +82,6 @@ def get_high_discounted_items(num=8):
         print(e)
     return products
 
-#user register
 @app.post("/api/user/register")
 def user_register():
     try:
@@ -95,7 +89,6 @@ def user_register():
         user_role = user_datastore.find_role('user')
         if user_role == None:
             return {"message":"User role not available."},200
-        #check if user already exists
         user = user_datastore.find_user(username=request_data['username'])
         if user:
             return {"message":"Username already exists."},409
@@ -106,7 +99,7 @@ def user_register():
             email = request_data['email'],
             password = request_data['password'],
             username = request_data['username'],
-            active = False,
+            active = True,
             first_name = request_data['first_name'],
             last_name = request_data['last_name'],
             telephone = request_data['telephone'],
@@ -118,7 +111,7 @@ def user_register():
         print(e)
         return {"message":"Something went wrong."},500
     
-#user login
+
 @app.route("/user/login", methods=['POST'])
 def user_login():
     if request.method == 'POST':

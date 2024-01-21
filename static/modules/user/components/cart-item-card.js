@@ -92,7 +92,7 @@ export default{
             if(result.status == 'Success'){
                 console.log(result.message);
                 alert(result.message);
-                this.$emit('cart-item-updated',1);
+                this.$emit('cart-item-updated');
             }else{
                 console.log(result.message);
                 alert(result.message);

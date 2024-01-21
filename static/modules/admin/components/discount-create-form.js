@@ -17,6 +17,17 @@ export default {
                             <h4 class="text-secondary">Enter details for new offer</h4>
                             <hr>
                             <div class="container">
+                                    <div v-if="errors_exist" class="mb-3 row">
+                                        <div class="col">
+                                            <div class="alert alert-danger" v-if="errors.length">
+                                                <ul>
+                                                    <li v-for="error in errors">{{ error }}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+
                                     <div class="mb-3 row">
                                         <label for="disname" class="col-4 col-form-label">Discount Name :</label>
                                         <div class="col-8">
@@ -38,8 +49,9 @@ export default {
                                     </div>
 
                                     <div class="mb-3 row">
-                                        <div class="col-8">
-                                            <input type="checkbox" v-model="discount.is_active" true-value="true" false-value="false">
+                                        <label for="disact" class="col-4 col-form-label">Active</label>
+                                        <div class="col-2">
+                                            <input type="checkbox" id="disact" v-model="discount.is_active" true-value="true" false-value="false">
                                         </div>
                                     </div>
                                     
@@ -66,6 +78,11 @@ export default {
             },
             errors: [],
         };
+    },
+    computed : {
+        errors_exist() {
+            return this.errors.length > 0;
+        }
     },
     components: {
         AdminNavbar,

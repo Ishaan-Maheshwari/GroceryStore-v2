@@ -14,7 +14,7 @@ export default {
             </h2>
             <hr>
         </div>
-        <div class="container px-4 py-4 mt-4" :key="cartPageKey">
+        <div class="container px-4 py-4 mt-4" >
             <div class="row">
                 <div v-if="isCartEmpty" class="alert alert-info" role="alert">
                     Your cart is empty. Please add some items to your cart.
@@ -55,7 +55,7 @@ export default {
             <div v-if="isCartEmpty">
                 No items in your cart.
             </div>
-            <CartItemCard v-else v-for="cart_item in cart_items" :cart_item="cart_item" :key="cart_item.id" />
+            <CartItemCard v-else v-for="cart_item in cart_items" :cart_item="cart_item" :key="cart_item.id" @cart-item-updated="forceRenderer" />
         </div>
     </div>
     `,
@@ -69,8 +69,7 @@ export default {
             user_id: null,
             cart_items: null,
             total_amount: 0,
-            address: null,
-            cartPageKey: 0
+            address: null
         }
     },
     computed : {
@@ -95,8 +94,7 @@ export default {
     },
     mounted (){
         this.$on('cart-item-updated', data => {
-            console.log('Event emitted with data:', data)
-            cartPageKey += 1;
+            this.fetchCartItems();
           })
     },
     created() {
@@ -109,8 +107,8 @@ export default {
         }
     },
     methods: {
-        forceRenderer(num=1) {
-            this.cartPageKey += num;
+        forceRenderer() {
+            this.fetchCartItems();
         },
         fetchCartItems() {
             fetch('/api/cart/details', {
@@ -142,8 +140,8 @@ export default {
                     if (data.status == 'Success') {
                         console.log(data.message);
                         alert(data.message);
-                        this.fetchCartItems();
-                        // this.$router.push('/orders');
+                        // this.fetchCartItems();
+                        this.$router.push('/orders');
                     } else {
                         console.log(data.message);
                         alert(data.message);

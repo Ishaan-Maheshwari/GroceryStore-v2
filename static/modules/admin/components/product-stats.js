@@ -1,22 +1,19 @@
 export default {
     name:'ProductStats',
     template:`
-    <div>
-        <div class="container">
-            <h2>Charts of ordered product quantities</h2>
-            <div class="row">
-                <div class="col col-sm-12 col-md-6">
-                    <canvas id="prod_barChart" width="100%" style=""></canvas>
-                </div>
-                <div class="col com-sm-12 col-md-6">
-                    <canvas id="prod_pieChart" width="100%" style="max-width:600px"></canvas>
-                </div>
-            </div>
-            <br>
-            <hr>
-        </div>
-        <br>
-    </div>
+      <div class="container-md">
+          <h2>Charts of ordered product quantities</h2>
+          <div class="row">
+              <div class="col col-sm-12 col-md-6">
+                  <canvas id="prod_barChart" width="100%" style=""></canvas>
+              </div>
+              <div class="col com-sm-12 col-md-6">
+                  <canvas id="prod_pieChart" width="100%" style="max-width:600px"></canvas>
+              </div>
+          </div>
+          <br>
+          <hr>
+      </div>
     `,
     data(){
         return{

@@ -5,7 +5,7 @@ export default{
         <h4 class="text-secondary">Enter into the Veggie-land 🍅</h4>
         <hr>
         {{error?error:null}}
-        <form @submit.prevent="register" method="post">
+        <form>
             <div class="mb-3 row">
                 <label for="username" class="col-4 col-form-label">Username</label>
                 <div class="col-8">
@@ -45,9 +45,14 @@ export default{
 
             <div class="mb-3 row">
                 <div class="col-sm-6">
-                    <button type="submit" class="btn btn-outline-primary">Register yourself</button>
+                    <button type="submit" class="btn btn-outline-secondary" @click="register(true)">Register as Manager</button>
                 </div>
                 <div class="col-sm-6">
+                    <button type="submit" class="btn btn-outline-primary" @click="register(false)">Register as User</button>
+                </div>
+            </div>
+            <div class="mb-3 row align-items-center">
+                <div class="col-sm-12 text-align-center">
                     <a href="#" @click="$emit('registered')" >Already have an account !</a>
                 </div>
             </div>
@@ -66,7 +71,11 @@ export default{
         }
     },
     methods:{
-        register(){
+        register(as_manager = false){
+            var url = '/api/user/register'
+            if(as_manager){
+                url = '/api/manager/register'
+            }
             const data = {
                 username:this.username,
                 email:this.email,
@@ -75,7 +84,7 @@ export default{
                 last_name:this.last_name,
                 telephone:this.telephone
             }
-            fetch('/api/user/register',{
+            fetch(url,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json'
