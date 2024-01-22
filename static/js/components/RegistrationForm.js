@@ -42,16 +42,22 @@ export default{
                     <input type="tel" class="form-control" v-model="telephone" id="tel" placeholder="Your telephone number">
                 </div>
             </div>
-
             <div class="mb-3 row">
-                <div class="col-sm-6">
+                <label for="memact" class="col-4 col-form-label">Active</label>
+                <div class="col-2">
+                    <input type="checkbox" id="memact" v-model="active" true-value="true" false-value="false">
+                </div>
+            </div>
+
+            <div class="mb-3 row justify-content-center align-items-center">
+                <div class="col-sm-6 col-md-4">
                     <button type="submit" class="btn btn-outline-secondary" @click="register(true)">Register as Manager</button>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 col-md-4">
                     <button type="submit" class="btn btn-outline-primary" @click="register(false)">Register as User</button>
                 </div>
             </div>
-            <div class="mb-3 row align-items-center">
+            <div v-if="isAdmin == false" class="mb-3 row align-items-center">
                 <div class="col-sm-12 text-align-center">
                     <a href="#" @click="$emit('registered')" >Already have an account !</a>
                 </div>
@@ -67,7 +73,13 @@ export default{
             first_name:'',
             last_name:'',
             telephone:'',
+            active:false,
             error:null
+        }
+    },
+    calculated:{
+        isAdmin(){
+            return localStorage.getItem('role') == 'admin'
         }
     },
     methods:{
@@ -82,7 +94,8 @@ export default{
                 password:this.password,
                 first_name:this.first_name,
                 last_name:this.last_name,
-                telephone:this.telephone
+                telephone:this.telephone,
+                active:this.active
             }
             fetch(url,{
                 method:'POST',

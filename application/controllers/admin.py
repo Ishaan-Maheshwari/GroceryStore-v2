@@ -4,6 +4,25 @@ from application.models import OrderDetails, user_datastore
 from application.database import db
 from application.models import Product, Category, Discount, OrderItems, User
 
+@app.post("/api/admin/get-all-managers")
+@auth_required('token')
+@roles_required('admin')
+def get_all_managers():
+    role_name = 'manager'
+    manager_role = user_datastore.find_role(role_name)
+    manager_role_id = manager_role.id
+    managers = db.session.query(User).join(User.roles).filter(User.roles.any(id=manager_role_id)).all()
+    managers_list = []
+    for manager in managers:
+        managers_list.append({
+            'id': manager.id,
+            'username': manager.username,
+            'email': manager.email,
+            'first_name': manager.first_name,
+            'last_name': manager.last_name,
+            'active': manager.active
+        })
+    return {"managers": managers_list, "message": "Managers retrieved successfully", "status": "Success"}, 200
 
 @app.route("/admin/activate/manager", methods=['POST'])
 @roles_required('admin')

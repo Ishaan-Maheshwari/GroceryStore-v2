@@ -112,13 +112,11 @@ class OrderItems(db.Model):
 
 class Requests(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', backref=db.backref('requests', lazy=True))
-    cat_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category', backref=db.backref('requests', lazy=True))
-    new_name = db.Column(db.String(100))
-    new_desc = db.Column(db.String(255))
-    status = db.Column(db.String(3))
+    requester_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    requester = db.relationship('User', backref=db.backref('requests', lazy=True))
+    action = db.Column(db.String(20))
+    details = db.Column(db.String(255))
+    status = db.Column(db.String(20))
     created_on = db.Column(db.DateTime, default=datetime.now)
     modified_on = db.Column(db.DateTime, default=datetime.now, onupdate = datetime.now)
 

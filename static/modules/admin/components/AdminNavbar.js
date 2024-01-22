@@ -21,16 +21,16 @@ export default{
                             <a class="nav-link text-secondary" :href="$router.resolve('/admin/products').href"><i class="bi bi-flower3"></i> Products</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-secondary" :href="this.$router.resolve('/admin/discounts').href"><i class="bi bi-percent"></i> Offers & Discounts</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve('/admin/discounts').href"><i class="bi bi-percent"></i> Offers & Discounts</a>
                         </li>
                         <li v-if="isAdmin" class="nav-item">
-                            <a class="nav-link text-secondary" href="">➕ New Store Manager</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve({path: '/admin/member/new'}).href">➕ New Store Manager</a>
                         </li>
                         <li v-if="isAdmin" class="nav-item">
                             <a class="nav-link text-secondary" href="">Requests</a>
                         </li>
                         <li v-if="isAdmin" class="nav-item">
-                            <a class="nav-link text-secondary" href="">Memberships</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve({path: '/admin/members'}).href">Memberships</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-secondary " href="#" @click="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>

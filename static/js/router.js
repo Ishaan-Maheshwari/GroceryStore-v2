@@ -13,6 +13,8 @@ import AdminEditCategoryForm from "../modules/admin/components/category-edit-for
 import AdminAllDiscounts from "../modules/admin/components/all-discounts.js"
 import AdminCreateDiscountForm from "../modules/admin/components/discount-create-form.js"
 import AdminEditDiscountForm from "../modules/admin/components/discount-edit-form.js"
+import AdminMembersPage from "../modules/admin/components/members-page.js"
+import MemberRegistrationForm from "../modules/admin/components/member-registration-form.js"
 
 import UserDashboard from "../modules/user/user-dashboard.js"   
 import AllProductsPage from "../modules/user/all-products.js"
@@ -44,6 +46,9 @@ const routes = [
     {path: '/admin/discounts', component: AdminAllDiscounts},
     {path: '/admin/discounts/new', component: AdminCreateDiscountForm},
     {path: '/admin/discounts/edit/:discount_id', component: AdminEditDiscountForm, props: true},
+
+    {path: '/admin/members', component: AdminMembersPage},
+    {path: '/admin/member/new', component: MemberRegistrationForm},
 
     {path: '/dashboard', component: UserDashboard},
     {path: '/products', component: AllProductsPage, props: true},
