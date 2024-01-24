@@ -1,6 +1,7 @@
+import json
 from flask import current_app as app, request
 from flask_security import auth_required, login_user, logout_user, roles_accepted, roles_required, verify_password
-from application.models import OrderDetails, user_datastore
+from application.models import OrderDetails, Requests, user_datastore
 from application.database import db
 from application.models import Product, Category, Discount, OrderItems, User
 
@@ -91,3 +92,90 @@ def daily_sales():
         'date': date
     }
     return {"daily_sales" : daily_sales, "message": "Daily sales retrieved successfully", "status": "Success"}, 200
+
+@app.get("/api/admin/get-all-requests")
+@auth_required('token')
+@roles_required('admin')
+def get_all_requests():
+    requests = db.session.query(Requests, User).join(User).filter(Requests.status == 'pending').all()
+    request_list = []
+    for request in requests:
+        request_list.append({
+            'id': request.Requests.id,
+            'requester_id': request.Requests.requester_id,
+            'requester_username': request.User.username,
+            'action': request.Requests.action,
+            'details': json.loads(request.Requests.details),
+            'status': request.Requests.status
+        })
+    return {"requests": request_list, "message": "Requests retrieved successfully", "status": "Success"}, 200
+
+@app.post("/api/admin/decline-request")
+@auth_required('token')
+@roles_required('admin')
+def decline_request():
+    request_data = request.get_json()
+    request_id = request_data['request_id']
+    myrequest = Requests.query.filter_by(id=request_id).first()
+    if myrequest:
+        myrequest.status = 'declined'
+        db.session.commit()
+        return {"message": "Request declined"}, 200
+    else:
+        return {"message": "Request not found"}, 404
+
+@app.post("/api/admin/approve-request")
+@auth_required('token')
+@roles_required('admin')
+def accept_request():
+    request_data = request.get_json()
+    request_id = request_data['request_id']
+    myrequest = Requests.query.filter_by(id=request_id).first()
+    if myrequest is None:
+        return {"message": "Request not found"}, 404
+    if myrequest.action == 'add_category':
+        details = json.loads(myrequest.details)
+        category = Category(name=details['name'], desc=details['desc'])
+        db.session.add(category)
+        myrequest.status = 'accepted'
+        db.session.commit()
+        return {"message": "Request Accepted and processed. Category added."}, 200
+    elif myrequest.action == 'edit_category':
+        details = json.loads(myrequest.details)
+        category = Category.query.filter_by(id=details['id']).first()
+        if category is None:
+            return {"message": "Category not found"}, 404
+        category.name = details['name']
+        category.desc = details['desc']
+        myrequest.status = 'accepted'
+        db.session.commit()
+        return {"message": "Request Accepted and processed. Category edited."}, 200
+    elif myrequest.action == 'delete_category':
+        details = json.loads(myrequest.details)
+        category = Category.query.filter_by(id=details['id']).first()
+        if category is None:
+            return {"message": "Category not found"}, 404
+        db.session.delete(category)
+        myrequest.status = 'accepted'
+        db.session.commit()
+        return {"message": "Request Accepted and processed. Category deleted."}, 200
+    elif myrequest.action == 'approve_manager':
+        details = json.loads(myrequest.details)
+        manager = User.query.filter_by(id=details['id']).first()
+        if manager is None:
+            return {"message": "Manager not found"}, 404
+        manager.active = True
+        myrequest.status = 'accepted'
+        db.session.commit()
+        return {"message": "Request Accepted and processed. Manager activated."}, 200
+    elif myrequest.action == 'decline_manager':
+        details = json.loads(myrequest.details)
+        manager = User.query.filter_by(id=details['id']).first()
+        if manager is None:
+            return {"message": "Manager not found"}, 404
+        manager.active = False
+        myrequest.status = 'accepted'
+        db.session.commit()
+        return {"message": "Request Accepted and processed. Manager deactivated."}, 200
+    else:
+        return {"message": "Request Action not found"}, 404

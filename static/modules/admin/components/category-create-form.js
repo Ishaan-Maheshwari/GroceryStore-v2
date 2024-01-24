@@ -70,6 +70,9 @@ export default {
             const data = await res.json();
             if (res.ok) {
                 console.log(data);
+                if( localStorage.getItem("role") == "manager" ){
+                    alert("Successfully requested to add category. \n Admin will review and update the category. \n Changes will be reflected after admin approval.");
+                }
                 this.$router.push({ path: "/admin/categories" });
             } else {
                 this.errors = data.errors;

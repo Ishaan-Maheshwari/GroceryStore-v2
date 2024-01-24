@@ -42,7 +42,7 @@ export default{
                     <input type="tel" class="form-control" v-model="telephone" id="tel" placeholder="Your telephone number">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div v-if="isAdmin" class="mb-3 row">
                 <label for="memact" class="col-4 col-form-label">Active</label>
                 <div class="col-2">
                     <input type="checkbox" id="memact" v-model="active" true-value="true" false-value="false">
@@ -57,7 +57,8 @@ export default{
                     <button type="submit" class="btn btn-outline-primary" @click="register(false)">Register as User</button>
                 </div>
             </div>
-            <div v-if="isAdmin == false" class="mb-3 row align-items-center">
+            <div v-if="isAdmin"></div>
+            <div v-else class="mb-3 row align-items-center">
                 <div class="col-sm-12 text-align-center">
                     <a href="#" @click="$emit('registered')" >Already have an account !</a>
                 </div>

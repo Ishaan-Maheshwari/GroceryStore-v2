@@ -1,0 +1,48 @@
+<!-- create a html template for user monthly report -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Report</title>
+</head>
+<body>
+    <div class="container-md" >
+        <div class="row justify-content-center align-items-center g-2">
+            <div class="col">
+                <h1>Monthly Report</h1>
+                <h3>for {{ month }} {{ year }}</h3>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Your Monthly Stats</h3>
+                        <p class="card-text">
+                            Total No. of Orders :  {{ data['total_number_of_orders'] }} <br>
+                            Total Order Amount :  {{ data['total_order_amount'] }} <br>
+                            Average Order Value :  {{ data['average_order_value'] }} <br>
+                            Most Ordered Products ~ <br>
+                              {% for msp in data['most_ordered_product'] %} msp <br> {% endfor %}
+                            Most Frequent Products : <br>
+                                {% for mfp in data['most_freq_prdcts'] %} mfp <br> {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center g-2">
+            <div class="col">
+                <p>Thank You</p>
+                <a href="http://127.0.0.1:8080/">Grocery Store</a>
+            </div>
+        </div>
+        
+
+    </div>
+    
+            
+</html>

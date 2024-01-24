@@ -15,6 +15,7 @@ import AdminCreateDiscountForm from "../modules/admin/components/discount-create
 import AdminEditDiscountForm from "../modules/admin/components/discount-edit-form.js"
 import AdminMembersPage from "../modules/admin/components/members-page.js"
 import MemberRegistrationForm from "../modules/admin/components/member-registration-form.js"
+import AdminRequestsPage from "../modules/admin/components/request-page.js"
 
 import UserDashboard from "../modules/user/user-dashboard.js"   
 import AllProductsPage from "../modules/user/all-products.js"
@@ -32,7 +33,7 @@ const routes = [
     { path: '/', component: Home},
     { path: '/logout', component: Logout},
 
-    {path: '/admin/home', component: AdminHome, props: true},
+    {path: '/admin/home', component: AdminHome},
     {path: '/admin/products', component: AdminAllProducts},
     {path: '/admin/product/view/:product_id', component: AdminProductDetails, props: true},
     {path: '/admin/product/new', component: AdminCreateProductForm},
@@ -49,6 +50,8 @@ const routes = [
 
     {path: '/admin/members', component: AdminMembersPage},
     {path: '/admin/member/new', component: MemberRegistrationForm},
+
+    {path: '/admin/requests', component: AdminRequestsPage},
 
     {path: '/dashboard', component: UserDashboard},
     {path: '/products', component: AllProductsPage, props: true},

@@ -24,10 +24,10 @@ export default{
                             <a class="nav-link text-secondary" :href="$router.resolve('/admin/discounts').href"><i class="bi bi-percent"></i> Offers & Discounts</a>
                         </li>
                         <li v-if="isAdmin" class="nav-item">
-                            <a class="nav-link text-secondary" :href="$router.resolve({path: '/admin/member/new'}).href">➕ New Store Manager</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve({path: '/admin/member/new'}).href">➕ New Store Membe</a>
                         </li>
                         <li v-if="isAdmin" class="nav-item">
-                            <a class="nav-link text-secondary" href="">Requests</a>
+                            <a class="nav-link text-secondary" :href="$router.resolve({path: '/admin/requests'}).href">Requests</a>
                         </li>
                         <li v-if="isAdmin" class="nav-item">
                             <a class="nav-link text-secondary" :href="$router.resolve({path: '/admin/members'}).href">Memberships</a>

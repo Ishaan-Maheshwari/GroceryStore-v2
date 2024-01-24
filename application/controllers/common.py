@@ -1,9 +1,11 @@
-from flask import current_app as app, request
+from flask import current_app as app, jsonify, request, send_file
 from flask_login import current_user
 from flask_security import auth_required, http_auth_required, login_user, logout_user, roles_accepted, verify_password
 from application.models import user_datastore
 from application.database import db
 from application.models import Product, Category, Discount
+from application.tasks import create_resource_csv
+from celery.result import AsyncResult
 
 @app.route("/api/login", methods=['POST'])
 def login():
@@ -36,7 +38,7 @@ def login():
             return {"message": "User not found"}, 401
 
 @app.post("/api/logout")
-@auth_required('token')
+# @auth_required('token')
 def logout():
     if request.method == 'POST':
         logout_user()

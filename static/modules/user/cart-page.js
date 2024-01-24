@@ -141,7 +141,7 @@ export default {
                         console.log(data.message);
                         alert(data.message);
                         // this.fetchCartItems();
-                        this.$router.push('/orders');
+                        this.$router.push('/myorders');
                     } else {
                         console.log(data.message);
                         alert(data.message);

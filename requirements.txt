@@ -1,4 +1,5 @@
 FLASK==2.2.5
+Flask-SQLAlchemy
 SQLAlchemy
 flask-restful
 requests
@@ -6,3 +7,4 @@ flask-login
 flask-security-too==5.1.2
 Werkzeug==2.3.0
 bcrypt
+celery

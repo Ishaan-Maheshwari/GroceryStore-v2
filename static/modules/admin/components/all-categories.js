@@ -44,6 +44,12 @@ export default{
     created(){
         this.fetchCategories()
     },
+    computed: {
+        isAdmin(){
+            return localStorage.getItem('user-role') == 'admin';
+        }
+    
+    },
     methods:{
         async fetchCategories(){
             const res = await fetch('api/categories');
@@ -77,8 +83,13 @@ export default{
             });
             const data = await res.json();
             if(res.ok){
-                this.categories = this.categories.filter(category => category.id != category_id);
-                console.log(data)
+                if(this.isAdmin){
+                    this.categories = this.categories.filter(category => category.id != category_id);
+                    console.log(data)
+                }else{
+                    alert('Delete Request Sent Successfully. Admin will review your request soon.');
+                }
+                
             }
             else{
                 console.log(data)

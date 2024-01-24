@@ -1,22 +1,30 @@
+import json
 from flask import current_app as app, request
 from flask_login import current_user
-from flask_security import login_user, verify_password
-from application.models import user_datastore
+from flask_security import login_user, roles_required, verify_password
+from application.database import db
+from application.models import Requests, user_datastore
 
 @app.post("/api/manager/register")
 def manager_register():
     try:
         request_data = request.get_json()
         manager_role = None
+        requested_active = False
         if current_user and current_user.has_role('admin'):
             manager_role = user_datastore.find_or_create_role('manager')
+            requested_active = True if request_data['active'] == 'true' else False
         else:
             manager_role = user_datastore.find_role('manager')
         if manager_role == None:
             return {"message":"Manager role not available."},418
-        requested_active = False
-        if current_user and current_user.has_role('admin'):
-                requested_active = True if request_data['active'] == 'true' else False
+        
+        user = user_datastore.find_user(username=request_data['username'])
+        if user:
+            return {"message":"Username already exists."},409
+        user = user_datastore.find_user(email=request_data['email'])
+        if user:
+            return {"message":"Email already exists."},409
         new_manager = user_datastore.create_user(
             email = request_data['email'],
             password = request_data['password'],
@@ -28,13 +36,20 @@ def manager_register():
         )
         user_datastore.add_role_to_user(new_manager,manager_role)
         user_datastore.commit()
-        return {
-            "message":"Successfully registered as Manager.",
-            "email" : new_manager.email,
-            "username": new_manager.username,
-            "role": "Manager",
-            "Active": new_manager.active
-        },201
+        if current_user and current_user.has_role('admin'):
+            new_manager = user_datastore.find_user(username=request_data['username'])
+            new_request = Requests(
+                requester_id = new_manager.id,
+                action = 'approve_manager',
+                details = json.dumps({
+                    'manager_id': new_manager.id
+                }),
+                status = 'pending'
+            )
+            db.session.add(new_request)
+            db.session.commit()
+            return {"message":"Successfully registered as Manager and request sent to admin for approval."},201
+        return {"message":"Successfully registered as Manager."},201
     except Exception as e:
         print(e)
         return {"message":"Something went wrong."},500
@@ -62,17 +77,28 @@ def manager_login():
         else:
             return "User not found"
 
-@app.route("/manager/logout", methods=['POST'])
-def manager_logout():
-    if request.method == 'POST':
-        request_data = request.get_json()
-        username = request_data['username']
-        user = user_datastore.find_user(username=username)
-        if user:
-            user_datastore.delete_auth_token(user)
-            user_datastore.commit()
-            return {"message": "Logout successful"}, 200
-        else:
-            return {"message": "User not found"}, 404
+#manager request approval from admin
+@app.post("/manager/request")
+@roles_required('manager')
+def manager_request():
+    request_data = request.get_json()
+    manager_id = request_data['manager_id']
+    user = user_datastore.find_user(id=manager_id)
+    if user:
+        if user.active == True:
+            return {"message": "User is already active"}, 200
+        new_request = Requests(
+            requester_id = manager_id,
+            action = 'approve_manager',
+            details = json.dumps({
+                'manager_id': manager_id
+            }),
+            status = 'pending'
+        )
+        db.session.add(new_request)
+        db.session.commit()
+        return {"message": "Request sent to admin"}, 200
+    else:
+        return {"message": "User not found"}, 404
 
 
