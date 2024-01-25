@@ -21,15 +21,6 @@ export default {
                 <div class="col-md-4">   
                         
                     <ul class="list-group">
-                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/profile'}).href">
-                            <i class="bi bi-pencil-square"></i> Edit Profile
-                        </a>
-                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/profile'}).href">
-                            <i class="bi bi-key"></i> Change Password
-                        </a>
-                        <a tag="li" class="list-group-item" :href="$router.resolve({path : '/profile'}).href">
-                            <i class="bi bi-trash"></i> Delete Profile
-                        </a>
                         <a tag="li" class="list-group-item" :href="$router.resolve({path : '/myorders'}).href">
                             <i class="bi bi-box-seam"></i> Orders
                         </a>

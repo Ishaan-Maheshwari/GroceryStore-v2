@@ -5,9 +5,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
 from application.models import Discount
+from application.instances import cache
 
 
 class DiscountResource(Resource):
+    @cache.cached(timeout=300)
     def get(self, discount_id=None):
         if discount_id:
             discount = Discount.query.get(discount_id)

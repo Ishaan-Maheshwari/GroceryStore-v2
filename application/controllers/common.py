@@ -1,3 +1,4 @@
+from application.instances import cache
 from flask import current_app as app, jsonify, request, send_file
 from flask_login import current_user
 from flask_security import auth_required, http_auth_required, login_user, logout_user, roles_accepted, verify_password
@@ -45,6 +46,7 @@ def logout():
         return {"message": "Logout successful"}, 200
 
 @app.get("/api/all_products")
+@cache.cached(timeout=300)
 def get_all_products():
     products = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).all()
     product_details = []
@@ -69,6 +71,7 @@ def get_all_products():
         return {"message" : "Something went wrong. Cannot fetch products."}, 401
 
 @app.get("/api/product/<int:product_id>")
+@cache.cached(timeout=300)
 def get_product(product_id):
     product = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.id == product_id).first()
     if product:
@@ -90,6 +93,7 @@ def get_product(product_id):
         return {"message" : "Something went wrong. Cannot fetch product."}, 401
 
 @app.get("/api/category/<int:category_id>/products")
+@cache.cached(timeout=300)
 def get_products_by_category(category_id):
     products = db.session.query(Product, Category, Discount).filter(Product.category_id == Category.id).filter(Product.discount_id == Discount.id).filter(Product.category_id == category_id).all()
     product_details = []

@@ -6,7 +6,7 @@ from flask_security import Security, SQLAlchemyUserDatastore
 from application.config import LocalDevelopmentConfig
 from application.database import db
 from application.models import user_datastore
-from application.tasks import daily_reminder, monthly_report
+from application.tasks import daily_reminder, monthly_report, create_resource_csv
 from celery.schedules import crontab
 from worker import celery_init_app
 from application.instances import cache
@@ -52,6 +52,7 @@ api.add_resource(DiscountResource, '/api/discounts', '/api/discounts/<int:discou
 @app.route("/")
 def home():
   # return monthly_report('ishaan@gmail.com','test')
+  # return create_resource_csv()
   return render_template('index.html')
 
 
@@ -81,15 +82,6 @@ def do_initial_setup():
        telephone='1234567890'
       )
     user_datastore.add_role_to_user(new_admin, admin_role)
-    # new_user = user_datastore.create_user(
-    #    username='ishaan',
-    #    email='ishaan@grocery.com', 
-    #    password='123', 
-    #    first_name='Ishaan', 
-    #    last_name='Maheshwari', 
-    #    telephone='1234567890'
-    #   )
-    # user_datastore.add_role_to_user(new_user, user_role)
     import json
     from application.models import Product, Category, Discount
     with open('./db_directory/category.json') as json_file:

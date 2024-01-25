@@ -110,7 +110,7 @@ def generate_report():
                 "units_sold": units_sold,
                 "revenue_generated": revenue
             })
-    return {"products": product_details}, 200
+    return product_details
 
 @shared_task(ignore_result=False)
 def create_resource_csv():

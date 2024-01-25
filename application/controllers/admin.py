@@ -1,6 +1,7 @@
 import json
 from flask import current_app as app, request
 from flask_security import auth_required, login_user, logout_user, roles_accepted, roles_required, verify_password
+from sqlalchemy import and_
 from application.models import OrderDetails, Requests, user_datastore
 from application.database import db
 from application.models import Product, Category, Discount, OrderItems, User
@@ -179,3 +180,47 @@ def accept_request():
         return {"message": "Request Accepted and processed. Manager deactivated."}, 200
     else:
         return {"message": "Request Action not found"}, 404
+
+@app.get("/api/admin/out-of-stock")
+@auth_required('token')
+@roles_accepted('admin','manager')
+def out_of_stock():
+    #get all products with quantity equal to 0 and return
+    out_of_stock = Product.query.filter_by(inventory=0).all()
+    res = []
+    for o in  out_of_stock:
+        res.append(
+            {
+                'id': o.id,
+                'name': o.name,
+                'desc': o.desc,
+                'category_id': o.category_id,
+                'discount_id': o.discount_id,
+                'inventory': o.inventory,
+                'price': o.price,
+                'manf_date': o.manf_date
+            }
+        )
+    return res
+
+@app.get("/api/admin/low-stock")
+@auth_required('token')
+@roles_accepted('admin','manager')
+def low_stock():
+    #get all products with quantity less than 10 and return
+    low_stock = Product.query.filter(and_(Product.inventory < 10, Product.inventory > 0)).all()
+    res = []
+    for o in  low_stock:
+        res.append(
+            {
+                'id': o.id,
+                'name': o.name,
+                'desc': o.desc,
+                'category_id': o.category_id,
+                'discount_id': o.discount_id,
+                'inventory': o.inventory,
+                'price': o.price,
+                'manf_date': o.manf_date
+            }
+        )
+    return res
