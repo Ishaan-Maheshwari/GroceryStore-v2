@@ -8,3 +8,4 @@ flask-security-too==5.1.2
 Werkzeug==2.3.0
 bcrypt
 celery
+Flask-Caching

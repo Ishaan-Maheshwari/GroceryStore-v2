@@ -7,9 +7,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import current_app as app
 from application.database import db
 from application.models import Category, Requests
+from application.instances import cache
 
 
 class CategoryResource(Resource):
+    @cache.cached(timeout=300)
     def get(self, category_id=None):
         if category_id:
             category = Category.query.get(category_id)

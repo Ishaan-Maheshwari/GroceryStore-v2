@@ -1,4 +1,5 @@
 import AdminNavbar from './AdminNavbar.js'
+import CategorySearchBar from './category-search-bar.js'
 
 export default{
     name:'AdminAllCategory',
@@ -9,7 +10,13 @@ export default{
             <h2 class="p-3 rounded" style="background-color:rgba(100, 247, 198, 0.5);">All Categories</h2>  
             <hr>
         </div>
-
+        <div class="container-md px-2 text-center mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <CategorySearchBar :searchvalue="sval" @categorysearch="filterCategories"/>
+                </div>
+            </div>
+        </div>
         <div class="container px-4">
             <div class="row">
                 <a class="btn btn-primary text-white" href="#" @click="addNewCategory" role="button">➕ Add New Category</a>
@@ -18,7 +25,7 @@ export default{
         <br>
         <div class="container">
             <div class="row">
-                <div class="card col-md-4 col-lg-3 mx-2 my-2 border-secondary shadow" v-for="category in categories" :index="category.id">
+                <div class="card col-md-4 col-lg-3 mx-2 my-2 border-secondary shadow" v-for="category in filtered_categories" :index="category.id">
                     <!-- <img class="card-img-top" src="holder.js/100x180/" alt=""> -->
 
                     <div class="card-body">
@@ -35,11 +42,14 @@ export default{
     `,
     data(){
         return{
-            categories:[]
+            categories:[],
+            filtered_categories:[],
+            sval : ''
         }
     },
     components:{
-        AdminNavbar
+        AdminNavbar,
+        CategorySearchBar
     },
     created(){
         this.fetchCategories()
@@ -56,6 +66,7 @@ export default{
             const data = await res.json()
             if(res.ok){
                 this.categories = data;
+                this.filtered_categories = data;
             }else{
                 console.log(data)
             }
@@ -94,6 +105,14 @@ export default{
             else{
                 console.log(data)
             }
+        },
+        filterCategories(searchvalue){
+            this.sval = searchvalue;
+            if(searchvalue == ''){
+                this.filtered_categories = this.categories;
+                return;
+            }
+            this.filtered_categories = this.categories.filter(category => category.name.toLowerCase().includes(searchvalue.toLowerCase()) || category.desc.toLowerCase().includes(searchvalue.toLowerCase()));
         }
     },
 

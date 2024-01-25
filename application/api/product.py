@@ -6,8 +6,10 @@ from flask import current_app as app
 from application.database import db
 from application.models import Product, Category
 from datetime import datetime
+from application.instances import cache
 
 class ProductResource(Resource):
+    @cache.cached(timeout=300)
     def get(self, product_id=None):
         if product_id:
             product = Product.query.get(product_id)

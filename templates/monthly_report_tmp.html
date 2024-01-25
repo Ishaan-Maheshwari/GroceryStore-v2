@@ -21,13 +21,16 @@
                     <div class="card-body">
                         <h3 class="card-title">Your Monthly Stats</h3>
                         <p class="card-text">
-                            Total No. of Orders :  {{ data['total_number_of_orders'] }} <br>
-                            Total Order Amount :  {{ data['total_order_amount'] }} <br>
-                            Average Order Value :  {{ data['average_order_value'] }} <br>
-                            Most Ordered Products ~ <br>
-                              {% for msp in data['most_ordered_product'] %} msp <br> {% endfor %}
-                            Most Frequent Products : <br>
-                                {% for mfp in data['most_freq_prdcts'] %} mfp <br> {% endfor %}
+                            <b>Total No. of Orders : </b>  {{ data['total_number_of_orders'] }} <br>
+                            <b>Order Amount :</b>   {{ data['total_order_amount'] }} <br>
+                            <b>Average Order Value : </b> {{ data['average_order_value'] }} <br>
+                            <br>
+                            <b>Most Ordered Products ~ </b><br>
+                              {% for msp in data['most_ordered_product'] %} {{ msp }} <br> {% endfor %}
+                            <br>
+                            <b>Most Frequent Products ~ </b>
+                            <br>
+                                {% for mfp in data['most_freq_prdcts'] %} {{ mfp }} <br> {% endfor %}
                         </p>
                     </div>
                 </div>

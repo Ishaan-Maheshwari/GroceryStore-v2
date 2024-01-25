@@ -17,3 +17,7 @@ class LocalDevelopmentConfig(Config):
     SQLITE_DB_DIR = os.path.join(basedir, "../db_directory")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "grocerystoredb.sqlite3")
     DEBUG = True
+    CACHE_TYPE = "RedisCache"
+    CACHE_REDIS_HOST = "127.0.0.1"
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_DB = 3

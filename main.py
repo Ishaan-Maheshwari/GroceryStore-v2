@@ -9,6 +9,7 @@ from application.models import user_datastore
 from application.tasks import daily_reminder, monthly_report
 from celery.schedules import crontab
 from worker import celery_init_app
+from application.instances import cache
 
 
 app = None
@@ -23,6 +24,7 @@ def create_app():
       app.config.from_object(LocalDevelopmentConfig)
     db.init_app(app)
     api = Api(app)
+    cache.init_app(app)
     app.security = Security(app, user_datastore)
     app.app_context().push()  
     return app, api
@@ -49,17 +51,18 @@ api.add_resource(DiscountResource, '/api/discounts', '/api/discounts/<int:discou
 
 @app.route("/")
 def home():
+  # return monthly_report('ishaan@gmail.com','test')
   return render_template('index.html')
 
 
 @celery_app.on_after_configure.connect
 def send_email(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour=1, minute=00),
+        crontab(hour=13, minute=25),
         daily_reminder.s('narendra@email.com', 'Daily Reminder'),
     )
     sender.add_periodic_task(
-        crontab(hour=1, minute=00, day_of_month=25),
+        crontab(hour=15, minute=25, day_of_month=25),
         monthly_report.s('narendra@gmail.com', 'Monthly Report'),
     )
 

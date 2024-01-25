@@ -1,4 +1,5 @@
 import AdminNavbar from './AdminNavbar.js'
+import ProductSearchBar from './product-search-bar.js'
 
 export default{
     name:'AdminAllProducts',
@@ -8,6 +9,14 @@ export default{
         <div class="container-md px-4 text-center mt-4">
             <h2 class="p-3 rounded" style="background-color:rgba(115, 252, 183, 0.5);">All Products</h2>
             <hr>
+        </div>
+
+        <div class="container px-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <ProductSearchBar :searchvalue="sval" @productsearch="filterProducts"/>
+                </div>
+            </div>
         </div>
 
         <div class="container px-4">
@@ -26,7 +35,7 @@ export default{
         <div class="container">
             <div class="row">
 
-                <div class="card col-md-4 col-lg-3 mx-2 my-2 border-secondary shadow" v-for="product in products">
+                <div class="card col-md-4 col-lg-3 mx-2 my-2 border-secondary shadow" v-for="product in filtered_products">
                     <!-- <img class="card-img-top" src="holder.js/100x180/" alt=""> -->
 
                     <div class="card-body">
@@ -48,11 +57,14 @@ export default{
     data(){
         return{
             products:[],
+            filtered_products:[],
+            sval : '',
             errors : []
         }
     },
     components:{
-        AdminNavbar
+        AdminNavbar,
+        ProductSearchBar
     },
     created(){
         this.fetchProducts()
@@ -63,6 +75,7 @@ export default{
             const data = await res.json()
             if(res.ok){
                 this.products = data.products;
+                this.filtered_products = this.products;
             }else{
                 console.log(data)
             }
@@ -91,6 +104,10 @@ export default{
                 console.log(data);
                 this.errors.push(data.message);
             }
+        },
+        filterProducts(search_value){
+            this.sval = search_value;
+            this.filtered_products = this.products.filter(product => product.product_name.toLowerCase().includes(search_value.toLowerCase()));
         }
     }
 }
